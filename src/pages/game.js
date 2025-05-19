@@ -32,6 +32,19 @@ export default function Game() {
     }
   }, [router.isReady, router.query]);
 
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+
+    return () => {
+      window.removeEventListener("beforeunload", handleBeforeUnload);
+    };
+  }, []);
+
   const handleHit = (hit) => {
     if (hits.length >= 3) return;
     setHits([...hits, hit]);
