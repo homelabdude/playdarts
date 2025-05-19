@@ -1,7 +1,7 @@
 import React from "react";
 
 const SECTORS = [
-  20, 1, 18, 4, 13, 9, 14, 11, 8, 16, 7, 19, 3, 17, 2, 15, 10, 6, 5, 12,
+  20, 1, 18, 4, 13, 6, 10, 15, 2, 17, 3, 19, 7, 16, 8, 11, 14, 9, 12, 5,
 ];
 
 const SECTOR_ANGLE = 360 / SECTORS.length;
