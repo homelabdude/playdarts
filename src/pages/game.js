@@ -10,16 +10,19 @@ export default function Game() {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [hits, setHits] = useState([]);
   const [startingScore, setStartingScore] = useState(501);
+  const [legsToWin, setLegsToWin] = useState(1);
   const isCricket = startingScore === "Cricket";
 
   useEffect(() => {
     if (!router.isReady) return;
 
-    const { mode, players: rawPlayers } = router.query;
+    const { mode, players: rawPlayers, legs } = router.query;
 
     try {
       const parsedPlayers = JSON.parse(rawPlayers);
       const cricketMode = mode === "Cricket";
+      const legCount = cricketMode ? null : Number(legs || 1);
+      setLegsToWin(Math.ceil(legCount / 2));
 
       setStartingScore(cricketMode ? "Cricket" : Number(mode) || 501);
 
@@ -28,6 +31,7 @@ export default function Game() {
           name,
           score: cricketMode ? 0 : Number(mode) || 501,
           hits: [],
+          legsWon: 0,
           marks: cricketMode
             ? {
                 15: 0,
@@ -53,15 +57,36 @@ export default function Game() {
     };
 
     window.addEventListener("beforeunload", handleBeforeUnload);
-
-    return () => {
-      window.removeEventListener("beforeunload", handleBeforeUnload);
-    };
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
   const handleHit = (hit) => {
     if (hits.length >= 3) return;
     setHits([...hits, hit]);
+  };
+
+  const resetForNextLeg = (winnerIndex) => {
+    const updatedPlayers = players.map((p, i) => ({
+      ...p,
+      score: isCricket ? 0 : startingScore,
+      hits: [],
+      legsWon: i === winnerIndex ? p.legsWon + 1 : p.legsWon,
+      marks: isCricket
+        ? {
+            15: 0,
+            16: 0,
+            17: 0,
+            18: 0,
+            19: 0,
+            20: 0,
+            25: 0,
+          }
+        : undefined,
+    }));
+
+    setPlayers(updatedPlayers);
+    setHits([]);
+    setCurrentPlayerIndex(winnerIndex); // winner starts next leg
   };
 
   const handleConfirmTurn = () => {
@@ -77,10 +102,8 @@ export default function Game() {
           const currentMarks = marks[value] ?? 0;
           const newMarks = Math.min(3, currentMarks + multiplier);
           const excess = Math.max(0, currentMarks + multiplier - 3);
-
           marks[value] = newMarks;
 
-          // Check if other players have closed this number
           const othersClosed = players.every(
             (p, i) => i === currentPlayerIndex || (p.marks?.[value] ?? 0) >= 3
           );
@@ -112,24 +135,38 @@ export default function Game() {
         isBust = true;
       } else if (scoreAfterTurn === 0) {
         const isDoubleOut =
-          (lastHit.value === 25 && lastHit.multiplier === 2) || // Inner bullseye
+          (lastHit.value === 25 && lastHit.multiplier === 2) ||
           lastHit.multiplier === 2;
 
-        if (!isDoubleOut) {
-          isBust = true;
-        }
+        if (!isDoubleOut) isBust = true;
       }
 
-      updatedPlayers = players.map((player, idx) => {
-        if (idx === currentPlayerIndex) {
-          return {
-            ...player,
-            score: isBust ? scoreBeforeTurn : scoreAfterTurn,
-            hits: [...player.hits, hits],
-          };
+      if (!isBust && scoreAfterTurn === 0) {
+        const playerWon = {
+          ...currentPlayer,
+          legsWon: currentPlayer.legsWon + 1,
+        };
+
+        if (playerWon.legsWon >= legsToWin) {
+          alert(`${playerWon.name} wins the match! 🏆`);
+          router.push("/");
+          return;
         }
-        return player;
-      });
+
+        alert(`${playerWon.name} wins the leg! 🎯`);
+        resetForNextLeg(currentPlayerIndex);
+        return;
+      }
+
+      updatedPlayers = players.map((p, i) =>
+        i === currentPlayerIndex
+          ? {
+              ...p,
+              score: isBust ? scoreBeforeTurn : scoreAfterTurn,
+              hits: [...p.hits, hits],
+            }
+          : p
+      );
     }
 
     setPlayers(updatedPlayers);
@@ -137,9 +174,7 @@ export default function Game() {
     setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
   };
 
-  const handleResetTurn = () => {
-    setHits([]);
-  };
+  const handleResetTurn = () => setHits([]);
 
   if (!players.length) return <div style={styles.loading}>Loading game...</div>;
 
@@ -156,6 +191,11 @@ export default function Game() {
       </Head>
       <div style={styles.container}>
         <h1 style={styles.title}>Game Mode: {startingScore}</h1>
+        {!isCricket && (
+          <p style={{ marginBottom: 8 }}>
+            First to {legsToWin} leg{legsToWin > 1 ? "s" : ""}
+          </p>
+        )}
         <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
         <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
@@ -184,12 +224,10 @@ export default function Game() {
             : "None"}
         </p>
 
-        {/* Show remaining score only if not cricket */}
         {!isCricket && (
           <p style={styles.score}>Remaining Score: {remainingScore}</p>
         )}
 
-        {/* Show Cricket marks if cricket */}
         {isCricket && (
           <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
             <h3>Cricket Marks:</h3>
@@ -200,9 +238,7 @@ export default function Game() {
                 </li>
               ))}
             </ul>
-            <p>
-              Score: {currentPlayer.score} (Points from hitting closed numbers)
-            </p>
+            <p>Score: {currentPlayer.score}</p>
           </div>
         )}
 
@@ -242,13 +278,12 @@ export default function Game() {
             >
               {p.name}:{" "}
               {isCricket
-                ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
-                    .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
-                    .join(" ")}`
-                : `Score: ${p.score}`}
+                ? `Score: ${p.score}`
+                : `Score: ${p.score} | Legs: ${p.legsWon}`}
             </li>
           ))}
         </ul>
+
         <Link href="/" style={styles.link}>
           ← Reset Game and go to Homepage
         </Link>
@@ -283,7 +318,6 @@ const styles = {
   },
   score: {
     fontSize: "1.1rem",
-
     marginTop: 8,
     fontWeight: "bold",
   },

@@ -43,8 +43,8 @@ export default function Dartboard({ onHit, disabled }) {
   const radiusTripleOuter = 70;
   const radiusTripleInner = 53;
 
-  const radiusOuterBull = 25;
-  const radiusBull = 9;
+  const radiusOuterBull = 30;
+  const radiusBull = 12;
 
   const handleClick = (value, multiplier) => {
     if (disabled) return;

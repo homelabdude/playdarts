@@ -7,7 +7,9 @@ export default function Home() {
   const router = useRouter();
   const [gameMode, setGameMode] = useState(null);
   const [players, setPlayers] = useState(["", ""]);
+  const [legs, setLegs] = useState(1);
   const maxPlayers = 4;
+  const maxLegs = 7;
 
   const handleAddPlayer = () => {
     if (players.length < maxPlayers) {
@@ -31,6 +33,11 @@ export default function Home() {
         mode: gameMode,
         players: JSON.stringify(players),
       };
+
+      if (typeof gameMode === "number") {
+        query.legs = legs.toString();
+      }
+
       router.push({ pathname: "/game", query });
     }
   };
@@ -70,6 +77,27 @@ export default function Home() {
               </label>
             ))}
           </div>
+
+          {typeof gameMode === "number" && (
+            <>
+              <h2 style={styles.subheading}>Number of Legs (1–{maxLegs})</h2>
+              <div style={styles.legsControl}>
+                <button
+                  style={styles.legsButton}
+                  onClick={() => setLegs((l) => Math.max(1, l - 2))}
+                >
+                  −
+                </button>
+                <span style={styles.legsDisplay}>{legs}</span>
+                <button
+                  style={styles.legsButton}
+                  onClick={() => setLegs((l) => Math.min(maxLegs, l + 2))}
+                >
+                  +
+                </button>
+              </div>
+            </>
+          )}
 
           {gameMode && (
             <>
@@ -230,5 +258,25 @@ const styles = {
     border: "none",
     borderRadius: 6,
     cursor: "pointer",
+  },
+  legsControl: {
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 10,
+    marginBottom: 20,
+  },
+  legsButton: {
+    padding: "4px 12px",
+    fontSize: "1.2rem",
+    backgroundColor: "#ddd",
+    border: "none",
+    borderRadius: 4,
+    cursor: "pointer",
+  },
+  legsDisplay: {
+    fontSize: "1.2rem",
+    minWidth: "20px",
+    textAlign: "center",
   },
 };
