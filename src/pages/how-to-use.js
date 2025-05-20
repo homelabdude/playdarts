@@ -49,7 +49,7 @@ export default function HowToUse() {
             <li>After 3 hits, confirm the turn to move to the next player.</li>
             <li>
               If you entered the wrong hit, just click on{" "}
-              <strong> Reset Turn </strong> and you can add the hits again.
+              <strong> Reset </strong> and you can add the hits again.
             </li>
             <li>The score auto-updates and tracks per turn and total.</li>
           </ul>
@@ -127,15 +127,14 @@ const styles = {
     maxWidth: 600,
     backgroundColor: "#fff",
     padding: 30,
-    borderRadius: 5,
-    boxShadow: "0 4px 20px rgba(0,0,0,0.1)",
+    borderRadius: "1rem",
+    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.05)",
     textAlign: "left",
   },
   heading: {
     fontSize: "2rem",
     marginBottom: 20,
     textAlign: "center",
-    textDecoration: "underline",
   },
   list: {
     margin: "1rem 0",

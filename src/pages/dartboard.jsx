@@ -30,8 +30,8 @@ function describeArc(cx, cy, radiusInner, radiusOuter, startAngle, endAngle) {
 }
 
 export default function Dartboard({ onHit, disabled }) {
-  const cx = 160;
-  const cy = 160;
+  const cx = 170;
+  const cy = 165;
 
   // Radii for rings (adjusted)
   const radiusDoubleOuter = 140;
@@ -53,9 +53,9 @@ export default function Dartboard({ onHit, disabled }) {
 
   return (
     <svg
-      width={350}
-      height={350}
-      viewBox="0 0 325 320"
+      width={380}
+      height={380}
+      viewBox="0 0 350 350"
       style={{ display: "block", margin: "auto" }}
     >
       <circle cx={cx} cy={cy} r={radiusDoubleOuter} fill="#222" />

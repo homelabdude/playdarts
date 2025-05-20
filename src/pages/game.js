@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Dartboard from "./dartboard";
 import Link from "next/link";
 import Head from "next/head";
+import { Toaster, toast } from "react-hot-toast";
 
 export default function Game() {
   const router = useRouter();
@@ -38,7 +39,7 @@ export default function Game() {
 
       setPlayers(
         parsedPlayers.map((name) => ({
-          name,
+          name: name.slice(0, 10),
           score: cricketMode ? 0 : Number(mode) || 501,
           hits: [],
           legs: 0,
@@ -181,10 +182,15 @@ export default function Game() {
         }));
 
         if (newLegCount >= legsToWin) {
-          alert(`${currentPlayer.name} wins the match!`);
-          router.push("/"); // Redirect to homepage on match end
+          toast.success(`${currentPlayer.name} wins the match!`, {
+            duration: 4000,
+          });
+          setTimeout(() => router.push("/"), 4200);
         } else {
-          alert(`${currentPlayer.name} wins leg ${currentLeg}!`);
+          toast(`${currentPlayer.name} wins leg ${currentLeg}!`, {
+            duration: 4000,
+            icon: "🎯",
+          });
         }
       }
     }
@@ -214,15 +220,20 @@ export default function Game() {
       <Head>
         <title>Playdarts.app - Darts Score Tracker</title>
       </Head>
+      <Toaster
+        position="top-center"
+        toastOptions={{
+          style: {
+            fontFamily: '"JetBrains Mono", monospace',
+          },
+        }}
+      />
       <div style={styles.container}>
         <h1 style={styles.title}>Game Mode: {startingScore}</h1>
         {!isCricket && (
-          <>
-            <h3 style={styles.legInfo}>
-              Leg {currentLeg} of {totalLegs}
-            </h3>
-            <h3 style={styles.legInfo}>Legs to Win: {legsToWin}</h3>
-          </>
+          <h3 style={styles.legInfo}>
+            Leg {currentLeg} of {totalLegs} - Legs to Win: {legsToWin}
+          </h3>
         )}
         <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
@@ -252,20 +263,40 @@ export default function Game() {
             : "None"}
         </p>
 
-        {!isCricket && (
-          <p style={styles.score}>Remaining Score: {remainingScore}</p>
-        )}
+        {!isCricket && <p style={styles.score}>Remaining : {remainingScore}</p>}
 
         {isCricket && (
           <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
-            <h3>Cricket Marks:</h3>
-            <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+            <h3>Cricket Marks</h3>
+            <ul
+              style={{
+                listStyle: "none",
+                paddingLeft: 0,
+                display: "flex",
+                flexWrap: "wrap",
+                gap: "20px",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
               {Object.entries(currentPlayer.marks).map(([num, count]) => (
-                <li key={num}>
-                  {num === "25" ? "Bull" : num}: {count} {count >= 3 ? "✓" : ""}
+                <li
+                  key={num}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "6px",
+                    fontWeight: count >= 3 ? "bold" : "normal",
+                    color: count >= 3 ? "#0070f3" : "inherit",
+                  }}
+                >
+                  <span>{num === "25" ? "Bull" : num}:</span>
+                  <span>{count}</span>
+                  {count >= 3 && <span style={{ color: "green" }}>✓</span>}
                 </li>
               ))}
             </ul>
+
             <p>
               Score: {currentPlayer.score} (Points from hitting closed numbers)
             </p>
@@ -278,7 +309,7 @@ export default function Game() {
             disabled={hits.length !== 3}
             style={{
               ...styles.button,
-              backgroundColor: "#2a9d8f",
+              backgroundColor: "#28a745",
               opacity: hits.length === 3 ? 1 : 0.5,
             }}
           >
@@ -289,11 +320,11 @@ export default function Game() {
             disabled={hits.length === 0}
             style={{
               ...styles.button,
-              backgroundColor: "#e76f51",
+              backgroundColor: "#dc3545",
               opacity: hits.length === 0 ? 0.5 : 1,
             }}
           >
-            🔄 Reset Turn
+            🔄 Reset
           </button>
         </div>
 
@@ -335,10 +366,10 @@ const styles = {
     fontSize: 18,
   },
   title: {
-    fontWeight: 10,
-    textDecoration: "underline",
-    fontSize: "1.4rem",
-    marginBottom: 10,
+    fontWeight: 600,
+    fontSize: "1.6rem",
+    marginBottom: 14,
+    color: "#111",
   },
   legInfo: {
     fontSize: "1rem",
@@ -371,6 +402,7 @@ const styles = {
     border: "none",
     borderRadius: 6,
     cursor: "pointer",
+    minWidth: "100px",
   },
   link: {
     display: "inline-block",

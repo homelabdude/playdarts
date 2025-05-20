@@ -1,0 +1,157 @@
+/* General layout */
+.container {
+  font-family: "JetBrains Mono", monospace;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9fafb;
+  padding: 20px;
+}
+
+.card {
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+  text-align: center;
+}
+
+/* Typography */
+.heading {
+  font-size: 2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+}
+
+.subheading {
+  font-size: 1.25rem;
+  margin: 2rem 0 1rem;
+  font-weight: 500;
+}
+
+.description {
+  font-size: 1rem;
+  color: #4b5563;
+  margin-bottom: 1.5rem;
+  text-align: left;
+  line-height: 1.6;
+}
+
+/* Radio buttons */
+.radioGroup {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.radioLabel {
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+/* Legs control */
+.legsControl {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 1.5rem;
+}
+
+.legsButton {
+  padding: 6px 12px;
+  font-size: 1.2rem;
+  background-color: #e5e7eb;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.legsDisplay {
+  font-size: 1.2rem;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* Player input */
+.playerRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.input {
+  width: 100%;
+  padding: 10px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #d1d5db;
+  outline: none;
+  transition: border 0.2s ease;
+}
+
+.input:focus {
+  border-color: #3b82f6;
+}
+
+/* Buttons */
+.addButton {
+  padding: 8px 14px;
+  font-size: 0.9rem;
+  border: 1px solid #2563eb;
+  background-color: #ffffff;
+  color: #2563eb;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-bottom: 1.5rem;
+  transition: all 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #eff6ff;
+}
+
+.startButton {
+  width: 100%;
+  padding: 12px 20px;
+  font-size: 1rem;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.startButton:disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.startButton:hover:not(:disabled) {
+  background-color: #1d4ed8;
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  color: #dc2626;
+}
+
+.helpLink {
+  display: inline-block;
+  margin-top: 1.5rem;
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: bold;
+}
