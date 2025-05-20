@@ -5,10 +5,10 @@ export default function HowToUse() {
   return (
     <>
       <Head>
-        <title>How to Use | Darts Score Tracker</title>
+        <title>Playdarts.app - Darts Score Tracker</title>
         <meta
           name="description"
-          content="Learn how to use the Darts Score Tracker app. Mobile friendly, supports 301/501 games, hit detection, and more."
+          content="Learn how to use Playdarts.app Darts Score Tracker app. Mobile friendly, supports 301/501 games, hit detection, and more."
         />
       </Head>
       <div style={styles.container}>
@@ -17,8 +17,8 @@ export default function HowToUse() {
 
           <p>
             This app is designed to track darts scores for games like{" "}
-            <strong>301</strong> and <strong>501</strong>. It&apos;s mobile-friendly
-            and touch-optimized.
+            <strong>301</strong> and <strong>501</strong>. It&apos;s
+            mobile-friendly and touch-optimized.
           </p>
 
           <ul style={styles.list}>
@@ -70,7 +70,8 @@ export default function HowToUse() {
           </p>
 
           <p>
-            To report any issues, please write to playdarts@ashwin.party.
+            To report any issues, please write to{" "}
+            <a href="mailto:playdarts@ashwin.party">playdarts@ashwin.party</a>
           </p>
 
           <Link href="/" style={styles.link}>
