@@ -1,0 +1,64 @@
+.container {
+  font-family: "JetBrains Mono", monospace;
+  padding: 20px;
+  text-align: center;
+}
+
+.loading {
+  padding: 50px;
+  font-size: 18px;
+}
+
+.title {
+  font-weight: 600;
+  font-size: 1.6rem;
+  margin-bottom: 14px;
+  color: #111;
+}
+
+.legInfo {
+  font-size: 1rem;
+  color: #555;
+  margin-bottom: 10px;
+}
+
+.turn {
+  font-size: 1.2rem;
+  margin: 10px 0 20px;
+}
+
+.hits {
+  margin-top: 20px;
+  font-size: 1.1rem;
+}
+
+.score {
+  font-size: 1.1rem;
+  margin-top: 8px;
+  font-weight: bold;
+}
+
+.buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  min-width: 100px;
+}
+
+.link {
+  display: inline-block;
+  margin-top: 20px;
+  color: #0070f3;
+  text-decoration: none;
+  font-weight: bold;
+}

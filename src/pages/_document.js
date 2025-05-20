@@ -10,7 +10,7 @@ export default function Document() {
         />
         <meta
           name="description"
-          content="Track your darts game easily with playdarts.app online score tracker. Supports 301 and 501 modes for up to 4 players."
+          content="Track your darts game easily with playdarts.app online score tracker. Supports 501 301 and Cricket modes for up to 4 players."
         />
       </Head>
       <body>

@@ -1,0 +1,28 @@
+.container {
+  font-family: "JetBrains Mono", monospace;
+  min-height: 50vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.text {
+  font-size: 1.2rem;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.link {
+  font-size: 1rem;
+  color: #0070f3;
+  text-decoration: none;
+  font-weight: bold;
+}

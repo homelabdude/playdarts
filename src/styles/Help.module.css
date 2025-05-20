@@ -1,0 +1,40 @@
+.container {
+    font-family: "JetBrains Mono", monospace;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f9fafb;
+    padding: 20px;
+  }
+  
+  .card {
+    width: 100%;
+    max-width: 600px;
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 1rem;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.05);
+    text-align: left;
+  }
+  
+  .heading {
+    font-size: 2rem;
+    margin-bottom: 20px;
+    text-align: center;
+  }
+  
+  .list {
+    margin: 1rem 0;
+    padding-left: 1.5rem;
+    line-height: 1.6;
+  }
+  
+  .link {
+    display: inline-block;
+    margin-top: 20px;
+    color: #0070f3;
+    text-decoration: none;
+    font-weight: bold;
+  }
+  

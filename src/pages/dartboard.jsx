@@ -167,7 +167,7 @@ export default function Dartboard({ onHit, disabled }) {
         style={{ cursor: disabled ? "default" : "pointer" }}
       />
 
-      {/* Correct number placement */}
+      {/* Number placement */}
       {SECTORS.map((value, i) => {
         // Calculate the center angle of sector i, adjusted so 20 is at top (-90deg)
         const angle = i * SECTOR_ANGLE - 90 + SECTOR_ANGLE / 2;

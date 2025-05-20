@@ -1,5 +1,6 @@
 import Head from "next/head";
 import Link from "next/link";
+import styles from "../styles/Help.module.css";
 
 export default function HowToUse() {
   return (
@@ -11,9 +12,9 @@ export default function HowToUse() {
           content="Learn how to use Playdarts.app Darts Score Tracker app. Mobile friendly, supports 301/501 games, hit detection, and more."
         />
       </Head>
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <h1 style={styles.heading}>How to Use</h1>
+      <div className={styles.container}>
+        <div className={styles.card}>
+          <h1 className={styles.heading}>How to Use</h1>
 
           <p>
             This app is designed to track darts scores for games like{" "}
@@ -22,7 +23,7 @@ export default function HowToUse() {
             touch-optimized.
           </p>
 
-          <ul style={styles.list}>
+          <ul className={styles.list}>
             <li>
               <strong>Select a game mode</strong> (501, 301 or Cricket) on the
               homepage.
@@ -103,7 +104,7 @@ export default function HowToUse() {
             <a href="mailto:admin@playdarts.app">admin@playdarts.app</a>
           </p>
 
-          <Link href="/" style={styles.link}>
+          <Link href="/" className={styles.link}>
             ← Back to Home
           </Link>
         </div>
@@ -111,41 +112,3 @@ export default function HowToUse() {
     </>
   );
 }
-
-const styles = {
-  container: {
-    fontFamily: '"JetBrains Mono", monospace',
-    minHeight: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#f9fafb",
-    padding: 20,
-  },
-  card: {
-    width: "100%",
-    maxWidth: 600,
-    backgroundColor: "#fff",
-    padding: 30,
-    borderRadius: "1rem",
-    boxShadow: "0 8px 30px rgba(0, 0, 0, 0.05)",
-    textAlign: "left",
-  },
-  heading: {
-    fontSize: "2rem",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  list: {
-    margin: "1rem 0",
-    paddingLeft: "1.5rem",
-    lineHeight: 1.6,
-  },
-  link: {
-    display: "inline-block",
-    marginTop: 20,
-    color: "#0070f3",
-    textDecoration: "none",
-    fontWeight: "bold",
-  },
-};

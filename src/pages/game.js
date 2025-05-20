@@ -4,6 +4,7 @@ import Dartboard from "./dartboard";
 import Link from "next/link";
 import Head from "next/head";
 import { Toaster, toast } from "react-hot-toast";
+import styles from "../styles/Game.module.css";
 
 export default function Game() {
   const router = useRouter();
@@ -70,9 +71,6 @@ export default function Game() {
     window.addEventListener("beforeunload", handleBeforeUnload);
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
-
-  // Redirect to homepage on match end
-  const routerPush = router.push;
 
   const handleHit = (hit) => {
     if (hits.length >= 3) return;
@@ -204,7 +202,8 @@ export default function Game() {
     setHits([]);
   };
 
-  if (!players.length) return <div style={styles.loading}>Loading game...</div>;
+  if (!players.length)
+    return <div className={styles.loading}>Loading game...</div>;
 
   const currentPlayer = players[currentPlayerIndex];
   const remainingScore = isCricket
@@ -228,31 +227,31 @@ export default function Game() {
           },
         }}
       />
-      <div style={styles.container}>
-        <h1 style={styles.title}>Game Mode: {startingScore}</h1>
+      <div className={styles.container}>
+        <h1 className={styles.title}>Game Mode: {startingScore}</h1>
         {!isCricket && (
-          <h3 style={styles.legInfo}>
+          <h3 className={styles.legInfo}>
             Leg {currentLeg} of {totalLegs} - Legs to Win: {legsToWin}
           </h3>
         )}
-        <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
+        <h2 className={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
         <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
 
         <button
           onClick={() => handleHit({ value: 0, multiplier: 1 })}
           disabled={hits.length >= 3}
+          className={styles.button}
           style={{
-            ...styles.button,
             backgroundColor: "#264653",
-            opacity: hits.length >= 3 ? 0.5 : 1,
-            marginTop: 10,
+            opacity: hits.length === 0 ? 0.5 : 1,
+            marginTop: "10px",
           }}
         >
           🎯 Miss
         </button>
 
-        <p style={styles.hits}>
+        <p className={styles.hits}>
           This turn:{" "}
           {hits.length
             ? hits
@@ -263,10 +262,12 @@ export default function Game() {
             : "None"}
         </p>
 
-        {!isCricket && <p style={styles.score}>Remaining : {remainingScore}</p>}
+        {!isCricket && (
+          <p className={styles.score}>Remaining : {remainingScore}</p>
+        )}
 
         {isCricket && (
-          <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
+          <div className={{ marginTop: 20, fontSize: "1.1rem" }}>
             <h3>Cricket Marks</h3>
             <ul
               style={{
@@ -303,12 +304,12 @@ export default function Game() {
           </div>
         )}
 
-        <div style={styles.buttons}>
+        <div className={styles.buttons}>
           <button
             onClick={handleConfirmTurn}
             disabled={hits.length !== 3}
+            className={styles.button}
             style={{
-              ...styles.button,
               backgroundColor: "#28a745",
               opacity: hits.length === 3 ? 1 : 0.5,
             }}
@@ -318,8 +319,8 @@ export default function Game() {
           <button
             onClick={handleResetTurn}
             disabled={hits.length === 0}
+            className={styles.button}
             style={{
-              ...styles.button,
               backgroundColor: "#dc3545",
               opacity: hits.length === 0 ? 0.5 : 1,
             }}
@@ -347,68 +348,10 @@ export default function Game() {
           ))}
         </ul>
 
-        <Link href="/" style={styles.link}>
+        <Link href="/" className={styles.link}>
           ← Reset Game and go to Homepage
         </Link>
       </div>
     </>
   );
 }
-
-const styles = {
-  container: {
-    fontFamily: '"JetBrains Mono", monospace',
-    padding: 20,
-    textAlign: "center",
-  },
-  loading: {
-    padding: 50,
-    fontSize: 18,
-  },
-  title: {
-    fontWeight: 600,
-    fontSize: "1.6rem",
-    marginBottom: 14,
-    color: "#111",
-  },
-  legInfo: {
-    fontSize: "1rem",
-    color: "#555",
-    marginBottom: 10,
-  },
-  turn: {
-    fontSize: "1.2rem",
-    margin: "10px 0 20px",
-  },
-  hits: {
-    marginTop: 20,
-    fontSize: "1.1rem",
-  },
-  score: {
-    fontSize: "1.1rem",
-    marginTop: 8,
-    fontWeight: "bold",
-  },
-  buttons: {
-    display: "flex",
-    gap: 10,
-    justifyContent: "center",
-    marginTop: 20,
-  },
-  button: {
-    padding: "10px 20px",
-    fontSize: "1rem",
-    color: "#fff",
-    border: "none",
-    borderRadius: 6,
-    cursor: "pointer",
-    minWidth: "100px",
-  },
-  link: {
-    display: "inline-block",
-    marginTop: 20,
-    color: "#0070f3",
-    textDecoration: "none",
-    fontWeight: "bold",
-  },
-};
