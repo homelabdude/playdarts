@@ -11,6 +11,7 @@ export default function Game() {
   const [hits, setHits] = useState([]);
   const [startingScore, setStartingScore] = useState(501);
   const [legsToWin, setLegsToWin] = useState(1);
+  const [totalLegs, setTotalLegs] = useState(1);
   const isCricket = startingScore === "Cricket";
 
   useEffect(() => {
@@ -21,17 +22,26 @@ export default function Game() {
     try {
       const parsedPlayers = JSON.parse(rawPlayers);
       const cricketMode = mode === "Cricket";
-      const legCount = cricketMode ? null : Number(legs || 1);
-      setLegsToWin(Math.ceil(legCount / 2));
+      const totalLegsFromParam = Number(legs) || 1;
 
-      setStartingScore(cricketMode ? "Cricket" : Number(mode) || 501);
+      setTotalLegs(totalLegsFromParam);
+
+      // For cricket mode, legsToWin = totalLegs (usually 1)
+      // For 301/501 modes, legsToWin = majority of total legs (best of N)
+      if (cricketMode) {
+        setLegsToWin(totalLegsFromParam);
+        setStartingScore("Cricket");
+      } else {
+        setStartingScore(Number(mode) || 501);
+        setLegsToWin(Math.ceil(totalLegsFromParam / 2));
+      }
 
       setPlayers(
         parsedPlayers.map((name) => ({
           name,
           score: cricketMode ? 0 : Number(mode) || 501,
           hits: [],
-          legsWon: 0,
+          legs: 0,
           marks: cricketMode
             ? {
                 15: 0,
@@ -60,33 +70,12 @@ export default function Game() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
+  // Redirect to homepage on match end
+  const routerPush = router.push;
+
   const handleHit = (hit) => {
     if (hits.length >= 3) return;
     setHits([...hits, hit]);
-  };
-
-  const resetForNextLeg = (winnerIndex) => {
-    const updatedPlayers = players.map((p, i) => ({
-      ...p,
-      score: isCricket ? 0 : startingScore,
-      hits: [],
-      legsWon: i === winnerIndex ? p.legsWon + 1 : p.legsWon,
-      marks: isCricket
-        ? {
-            15: 0,
-            16: 0,
-            17: 0,
-            18: 0,
-            19: 0,
-            20: 0,
-            25: 0,
-          }
-        : undefined,
-    }));
-
-    setPlayers(updatedPlayers);
-    setHits([]);
-    setCurrentPlayerIndex(winnerIndex); // winner starts next leg
   };
 
   const handleConfirmTurn = () => {
@@ -94,33 +83,53 @@ export default function Game() {
     let updatedPlayers = [...players];
 
     if (isCricket) {
-      const marks = { ...currentPlayer.marks };
+      const numbers = [15, 16, 17, 18, 19, 20, 25];
+      let updatedMarks = { ...currentPlayer.marks };
       let scoreGain = 0;
 
+      // Count hits per number in this turn
+      const hitsCountThisTurn = {};
       hits.forEach(({ value, multiplier }) => {
-        if ((value >= 15 && value <= 20) || value === 25) {
-          const currentMarks = marks[value] ?? 0;
-          const newMarks = Math.min(3, currentMarks + multiplier);
-          const excess = Math.max(0, currentMarks + multiplier - 3);
-          marks[value] = newMarks;
-
-          const othersClosed = players.every(
-            (p, i) => i === currentPlayerIndex || (p.marks?.[value] ?? 0) >= 3
-          );
-
-          if (!othersClosed) {
-            scoreGain += value * excess;
-          }
+        if (numbers.includes(value)) {
+          hitsCountThisTurn[value] =
+            (hitsCountThisTurn[value] || 0) + multiplier;
         }
       });
 
-      updatedPlayers[currentPlayerIndex] = {
-        ...currentPlayer,
-        hits: [...currentPlayer.hits, hits],
-        score: currentPlayer.score + scoreGain,
-        marks,
-      };
+      for (const num of numbers) {
+        const beforeMarks = currentPlayer.marks[num] || 0;
+        const hitsThisTurnForNum = hitsCountThisTurn[num] || 0;
+        const totalMarks = beforeMarks + hitsThisTurnForNum;
+
+        // Update marks capped at 3
+        updatedMarks[num] = Math.min(totalMarks, 3);
+
+        // Calculate extra hits beyond 3 this turn
+        const extraHits = totalMarks > 3 ? totalMarks - 3 : 0;
+
+        // Points count only if opponent hasn't closed the number
+        const opponentsClosed = players.every((p, idx) =>
+          idx === currentPlayerIndex ? true : (p.marks[num] || 0) >= 3
+        );
+
+        if (extraHits > 0 && !opponentsClosed) {
+          scoreGain += extraHits * num;
+        }
+      }
+
+      updatedPlayers = players.map((p, idx) => {
+        if (idx === currentPlayerIndex) {
+          return {
+            ...p,
+            marks: updatedMarks,
+            score: p.score + scoreGain,
+            hits: [...p.hits, hits],
+          };
+        }
+        return p;
+      });
     } else {
+      // 301 or 501 mode logic
       const scoreBeforeTurn = currentPlayer.score;
       const scoreThisTurn = hits.reduce(
         (sum, hit) => sum + hit.value * hit.multiplier,
@@ -130,6 +139,7 @@ export default function Game() {
       const lastHit = hits[hits.length - 1];
 
       let isBust = false;
+      let wonLeg = false;
 
       if (scoreAfterTurn < 0 || scoreAfterTurn === 1) {
         isBust = true;
@@ -138,35 +148,45 @@ export default function Game() {
           (lastHit.value === 25 && lastHit.multiplier === 2) ||
           lastHit.multiplier === 2;
 
-        if (!isDoubleOut) isBust = true;
-      }
-
-      if (!isBust && scoreAfterTurn === 0) {
-        const playerWon = {
-          ...currentPlayer,
-          legsWon: currentPlayer.legsWon + 1,
-        };
-
-        if (playerWon.legsWon >= legsToWin) {
-          alert(`${playerWon.name} wins the match! 🏆`);
-          router.push("/");
-          return;
+        if (!isDoubleOut) {
+          isBust = true;
+        } else {
+          wonLeg = true;
         }
-
-        alert(`${playerWon.name} wins the leg! 🎯`);
-        resetForNextLeg(currentPlayerIndex);
-        return;
       }
 
-      updatedPlayers = players.map((p, i) =>
-        i === currentPlayerIndex
-          ? {
-              ...p,
-              score: isBust ? scoreBeforeTurn : scoreAfterTurn,
-              hits: [...p.hits, hits],
-            }
-          : p
-      );
+      updatedPlayers = players.map((player, idx) => {
+        if (idx === currentPlayerIndex) {
+          return {
+            ...player,
+            score: isBust
+              ? scoreBeforeTurn
+              : wonLeg
+              ? startingScore
+              : scoreAfterTurn,
+            hits: [...player.hits, hits],
+            legs: wonLeg ? player.legs + 1 : player.legs,
+          };
+        }
+        return player;
+      });
+
+      if (wonLeg) {
+        const newLegCount = updatedPlayers[currentPlayerIndex].legs;
+
+        // Reset all players' scores for new leg
+        updatedPlayers = updatedPlayers.map((p) => ({
+          ...p,
+          score: startingScore,
+        }));
+
+        if (newLegCount >= legsToWin) {
+          alert(`${currentPlayer.name} wins the match!`);
+          router.push("/"); // Redirect to homepage on match end
+        } else {
+          alert(`${currentPlayer.name} wins leg ${currentLeg}!`);
+        }
+      }
     }
 
     setPlayers(updatedPlayers);
@@ -174,7 +194,9 @@ export default function Game() {
     setCurrentPlayerIndex((currentPlayerIndex + 1) % players.length);
   };
 
-  const handleResetTurn = () => setHits([]);
+  const handleResetTurn = () => {
+    setHits([]);
+  };
 
   if (!players.length) return <div style={styles.loading}>Loading game...</div>;
 
@@ -184,6 +206,9 @@ export default function Game() {
     : currentPlayer.score -
       hits.reduce((sum, h) => sum + h.value * h.multiplier, 0);
 
+  const legsPlayed = players.reduce((sum, p) => sum + p.legs, 0);
+  const currentLeg = legsPlayed + 1;
+
   return (
     <>
       <Head>
@@ -192,9 +217,12 @@ export default function Game() {
       <div style={styles.container}>
         <h1 style={styles.title}>Game Mode: {startingScore}</h1>
         {!isCricket && (
-          <p style={{ marginBottom: 8 }}>
-            First to {legsToWin} leg{legsToWin > 1 ? "s" : ""}
-          </p>
+          <>
+            <h3 style={styles.legInfo}>
+              Leg {currentLeg} of {totalLegs}
+            </h3>
+            <h3 style={styles.legInfo}>Legs to Win: {legsToWin}</h3>
+          </>
         )}
         <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
@@ -238,7 +266,9 @@ export default function Game() {
                 </li>
               ))}
             </ul>
-            <p>Score: {currentPlayer.score}</p>
+            <p>
+              Score: {currentPlayer.score} (Points from hitting closed numbers)
+            </p>
           </div>
         )}
 
@@ -278,8 +308,10 @@ export default function Game() {
             >
               {p.name}:{" "}
               {isCricket
-                ? `Score: ${p.score}`
-                : `Score: ${p.score} | Legs: ${p.legsWon}`}
+                ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
+                    .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
+                    .join(" ")}`
+                : `Score: ${p.score}, Legs: ${p.legs}`}
             </li>
           ))}
         </ul>
@@ -306,6 +338,11 @@ const styles = {
     fontWeight: 10,
     textDecoration: "underline",
     fontSize: "1.4rem",
+    marginBottom: 10,
+  },
+  legInfo: {
+    fontSize: "1rem",
+    color: "#555",
     marginBottom: 10,
   },
   turn: {
