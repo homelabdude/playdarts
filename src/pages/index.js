@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function Home() {
   const router = useRouter();
@@ -35,95 +36,104 @@ export default function Home() {
   };
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.heading}>playdarts.app</h1>
-        <h2 style={styles.subheading}>A clean, ad-free darts score tracker</h2>
-        <p style={styles.description}>
-          This is a simple ad-free score tracking app for Darts games. Select
-          your game mode (501, 301 and Cricket), add players, and start keeping
-          score. Supports up to 4 players in a classic darts match.
-        </p>
+    <>
+      <Head>
+        <title>Playdarts.app - Darts Score Tracker</title>
+      </Head>
+      <div style={styles.container}>
+        <div style={styles.card}>
+          <h1 style={styles.heading}>playdarts.app</h1>
+          <h2 style={styles.subheading}>
+            A clean, ad-free darts score tracker
+          </h2>
+          <p style={styles.description}>
+            This is a simple ad-free score tracking app for Darts games. Select
+            your game mode (501, 301 and Cricket), add players, and start
+            keeping score. Supports up to 4 players in a classic darts match.
+          </p>
 
-        <h2 style={styles.subheading}>Select Game Mode</h2>
-        <div style={styles.radioGroup}>
-          {[301, 501, "Cricket"].map((mode) => (
-            <label key={mode} style={styles.radioLabel}>
-              <input
-                type="radio"
-                name="mode"
-                value={mode}
-                onChange={(e) => {
-                  const value = e.target.value;
-                  setGameMode(isNaN(Number(value)) ? value : Number(value));
-                }}
-                checked={gameMode === mode}
-              />{" "}
-              {mode}
-            </label>
-          ))}
-        </div>
-
-        {gameMode && (
-          <>
-            <h2 style={styles.subheading}>Add Players (2–{maxPlayers})</h2>
-            {players.map((player, idx) => (
-              <div key={idx} style={styles.playerRow}>
+          <h2 style={styles.subheading}>Select Game Mode</h2>
+          <div style={styles.radioGroup}>
+            {[301, 501, "Cricket"].map((mode) => (
+              <label key={mode} style={styles.radioLabel}>
                 <input
-                  placeholder={`Player ${idx + 1}`}
-                  value={player}
-                  onChange={(e) => handlePlayerNameChange(idx, e.target.value)}
-                  style={{ ...styles.input, flex: 1 }}
-                />
-                {players.length > 2 && (
-                  <button
-                    onClick={() => {
-                      const updated = players.filter((_, i) => i !== idx);
-                      setPlayers(updated);
-                    }}
-                    style={styles.deleteButton}
-                    title="Remove player"
-                  >
-                    🗑️
-                  </button>
-                )}
-              </div>
+                  type="radio"
+                  name="mode"
+                  value={mode}
+                  onChange={(e) => {
+                    const value = e.target.value;
+                    setGameMode(isNaN(Number(value)) ? value : Number(value));
+                  }}
+                  checked={gameMode === mode}
+                />{" "}
+                {mode}
+              </label>
             ))}
+          </div>
 
-            {players.length < maxPlayers && (
-              <button style={styles.addButton} onClick={handleAddPlayer}>
-                + Add Player
-              </button>
-            )}
-          </>
-        )}
+          {gameMode && (
+            <>
+              <h2 style={styles.subheading}>Add Players (2–{maxPlayers})</h2>
+              {players.map((player, idx) => (
+                <div key={idx} style={styles.playerRow}>
+                  <input
+                    placeholder={`Player ${idx + 1}`}
+                    value={player}
+                    onChange={(e) =>
+                      handlePlayerNameChange(idx, e.target.value)
+                    }
+                    style={{ ...styles.input, flex: 1 }}
+                  />
+                  {players.length > 2 && (
+                    <button
+                      onClick={() => {
+                        const updated = players.filter((_, i) => i !== idx);
+                        setPlayers(updated);
+                      }}
+                      style={styles.deleteButton}
+                      title="Remove player"
+                    >
+                      🗑️
+                    </button>
+                  )}
+                </div>
+              ))}
 
-        <button
-          onClick={handleStartGame}
-          style={{
-            ...styles.startButton,
-            opacity:
-              gameMode &&
-              players.every((p) => p.trim() !== "") &&
-              players.length >= 2
-                ? 1
-                : 0.5,
-            pointerEvents:
-              gameMode &&
-              players.every((p) => p.trim() !== "") &&
-              players.length >= 2
-                ? "auto"
-                : "none",
-          }}
-        >
-          Start Game
-        </button>
+              {players.length < maxPlayers && (
+                <button style={styles.addButton} onClick={handleAddPlayer}>
+                  + Add Player
+                </button>
+              )}
+            </>
+          )}
 
-        <Link href="/how-to-use" style={styles.helpLink}>
-          📘 How to Use
-        </Link>
+          <button
+            onClick={handleStartGame}
+            style={{
+              ...styles.startButton,
+              opacity:
+                gameMode &&
+                players.every((p) => p.trim() !== "") &&
+                players.length >= 2
+                  ? 1
+                  : 0.5,
+              pointerEvents:
+                gameMode &&
+                players.every((p) => p.trim() !== "") &&
+                players.length >= 2
+                  ? "auto"
+                  : "none",
+            }}
+          >
+            Start Game
+          </button>
+
+          <Link href="/how-to-use" style={styles.helpLink}>
+            📘 How to Use
+          </Link>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
 

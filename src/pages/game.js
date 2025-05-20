@@ -2,6 +2,7 @@ import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Dartboard from "./dartboard";
 import Link from "next/link";
+import Head from "next/head";
 
 export default function Game() {
   const router = useRouter();
@@ -149,103 +150,110 @@ export default function Game() {
       hits.reduce((sum, h) => sum + h.value * h.multiplier, 0);
 
   return (
-    <div style={styles.container}>
-      <h1 style={styles.title}>Game Mode: {startingScore}</h1>
-      <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
+    <>
+      <Head>
+        <title>Playdarts.app - Darts Score Tracker</title>
+      </Head>
+      <div style={styles.container}>
+        <h1 style={styles.title}>Game Mode: {startingScore}</h1>
+        <h2 style={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
-      <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
+        <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
 
-      <button
-        onClick={() => handleHit({ value: 0, multiplier: 1 })}
-        disabled={hits.length >= 3}
-        style={{
-          ...styles.button,
-          backgroundColor: "#264653",
-          opacity: hits.length >= 3 ? 0.5 : 1,
-          marginTop: 10,
-        }}
-      >
-        🎯 Miss
-      </button>
-
-      <p style={styles.hits}>
-        This turn:{" "}
-        {hits.length
-          ? hits
-              .map((h) =>
-                h.value === 0 ? "Miss" : `${h.value}×${h.multiplier}`
-              )
-              .join(", ")
-          : "None"}
-      </p>
-
-      {/* Show remaining score only if not cricket */}
-      {!isCricket && (
-        <p style={styles.score}>Remaining Score: {remainingScore}</p>
-      )}
-
-      {/* Show Cricket marks if cricket */}
-      {isCricket && (
-        <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
-          <h3>Cricket Marks:</h3>
-          <ul style={{ listStyle: "none", paddingLeft: 0 }}>
-            {Object.entries(currentPlayer.marks).map(([num, count]) => (
-              <li key={num}>
-                {num === "25" ? "Bull" : num}: {count} {count >= 3 ? "✓" : ""}
-              </li>
-            ))}
-          </ul>
-          <p>
-            Score: {currentPlayer.score} (Points from hitting closed numbers)
-          </p>
-        </div>
-      )}
-
-      <div style={styles.buttons}>
         <button
-          onClick={handleConfirmTurn}
-          disabled={hits.length !== 3}
+          onClick={() => handleHit({ value: 0, multiplier: 1 })}
+          disabled={hits.length >= 3}
           style={{
             ...styles.button,
-            backgroundColor: "#2a9d8f",
-            opacity: hits.length === 3 ? 1 : 0.5,
+            backgroundColor: "#264653",
+            opacity: hits.length >= 3 ? 0.5 : 1,
+            marginTop: 10,
           }}
         >
-          ✅ OK
+          🎯 Miss
         </button>
-        <button
-          onClick={handleResetTurn}
-          disabled={hits.length === 0}
-          style={{
-            ...styles.button,
-            backgroundColor: "#e76f51",
-            opacity: hits.length === 0 ? 0.5 : 1,
-          }}
-        >
-          🔄 Reset Turn
-        </button>
-      </div>
 
-      <h3 style={{ marginTop: 30 }}>🏅 Player Scores</h3>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {players.map((p, i) => (
-          <li
-            key={p.name}
-            style={{ fontWeight: i === currentPlayerIndex ? "bold" : "normal" }}
+        <p style={styles.hits}>
+          This turn:{" "}
+          {hits.length
+            ? hits
+                .map((h) =>
+                  h.value === 0 ? "Miss" : `${h.value}×${h.multiplier}`
+                )
+                .join(", ")
+            : "None"}
+        </p>
+
+        {/* Show remaining score only if not cricket */}
+        {!isCricket && (
+          <p style={styles.score}>Remaining Score: {remainingScore}</p>
+        )}
+
+        {/* Show Cricket marks if cricket */}
+        {isCricket && (
+          <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
+            <h3>Cricket Marks:</h3>
+            <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+              {Object.entries(currentPlayer.marks).map(([num, count]) => (
+                <li key={num}>
+                  {num === "25" ? "Bull" : num}: {count} {count >= 3 ? "✓" : ""}
+                </li>
+              ))}
+            </ul>
+            <p>
+              Score: {currentPlayer.score} (Points from hitting closed numbers)
+            </p>
+          </div>
+        )}
+
+        <div style={styles.buttons}>
+          <button
+            onClick={handleConfirmTurn}
+            disabled={hits.length !== 3}
+            style={{
+              ...styles.button,
+              backgroundColor: "#2a9d8f",
+              opacity: hits.length === 3 ? 1 : 0.5,
+            }}
           >
-            {p.name}:{" "}
-            {isCricket
-              ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
-                  .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
-                  .join(" ")}`
-              : `Score: ${p.score}`}
-          </li>
-        ))}
-      </ul>
-      <Link href="/" style={styles.link}>
-        ← Reset Game and go to Homepage
-      </Link>
-    </div>
+            ✅ OK
+          </button>
+          <button
+            onClick={handleResetTurn}
+            disabled={hits.length === 0}
+            style={{
+              ...styles.button,
+              backgroundColor: "#e76f51",
+              opacity: hits.length === 0 ? 0.5 : 1,
+            }}
+          >
+            🔄 Reset Turn
+          </button>
+        </div>
+
+        <h3 style={{ marginTop: 30 }}>🏅 Player Scores</h3>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {players.map((p, i) => (
+            <li
+              key={p.name}
+              style={{
+                fontWeight: i === currentPlayerIndex ? "bold" : "normal",
+              }}
+            >
+              {p.name}:{" "}
+              {isCricket
+                ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
+                    .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
+                    .join(" ")}`
+                : `Score: ${p.score}`}
+            </li>
+          ))}
+        </ul>
+        <Link href="/" style={styles.link}>
+          ← Reset Game and go to Homepage
+        </Link>
+      </div>
+    </>
   );
 }
 

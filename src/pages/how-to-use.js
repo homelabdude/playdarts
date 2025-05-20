@@ -83,7 +83,7 @@ export default function HowToUse() {
           <p>
             Once a number is closed, the player can{" "}
             <strong>score points</strong> on that number{" "}
-            <strong>only if opponents haven't closed it yet</strong>.
+            <strong>only if opponents haven&apos;t closed it yet</strong>.
           </p>
           <p>
             The game ends when <strong>one player closes all numbers</strong>{" "}
