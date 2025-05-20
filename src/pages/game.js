@@ -9,6 +9,7 @@ export default function Game() {
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [hits, setHits] = useState([]);
   const [startingScore, setStartingScore] = useState(501);
+  const isCricket = startingScore === "Cricket";
 
   useEffect(() => {
     if (!router.isReady) return;
@@ -17,14 +18,26 @@ export default function Game() {
 
     try {
       const parsedPlayers = JSON.parse(rawPlayers);
-      const score = Number(mode) || 501;
+      const cricketMode = mode === "Cricket";
 
-      setStartingScore(score);
+      setStartingScore(cricketMode ? "Cricket" : Number(mode) || 501);
+
       setPlayers(
         parsedPlayers.map((name) => ({
           name,
-          score,
+          score: cricketMode ? 0 : Number(mode) || 501,
           hits: [],
+          marks: cricketMode
+            ? {
+                15: 0,
+                16: 0,
+                17: 0,
+                18: 0,
+                19: 0,
+                20: 0,
+                25: 0,
+              }
+            : undefined,
         }))
       );
     } catch (e) {
@@ -51,40 +64,72 @@ export default function Game() {
   };
 
   const handleConfirmTurn = () => {
-    const scoreBeforeTurn = currentPlayer.score;
+    const currentPlayer = players[currentPlayerIndex];
+    let updatedPlayers = [...players];
 
-    const scoreThisTurn = hits.reduce(
-      (sum, hit) => sum + hit.value * hit.multiplier,
-      0
-    );
+    if (isCricket) {
+      const marks = { ...currentPlayer.marks };
+      let scoreGain = 0;
 
-    const scoreAfterTurn = scoreBeforeTurn - scoreThisTurn;
-    const lastHit = hits[hits.length - 1];
+      hits.forEach(({ value, multiplier }) => {
+        if ((value >= 15 && value <= 20) || value === 25) {
+          const currentMarks = marks[value] ?? 0;
+          const newMarks = Math.min(3, currentMarks + multiplier);
+          const excess = Math.max(0, currentMarks + multiplier - 3);
 
-    let isBust = false;
+          marks[value] = newMarks;
 
-    if (scoreAfterTurn < 0 || scoreAfterTurn === 1) {
-      isBust = true;
-    } else if (scoreAfterTurn === 0) {
-      const isDoubleOut =
-        (lastHit.value === 25 && lastHit.multiplier === 2) || // Inner bullseye
-        lastHit.multiplier === 2;
+          // Check if other players have closed this number
+          const othersClosed = players.every(
+            (p, i) => i === currentPlayerIndex || (p.marks?.[value] ?? 0) >= 3
+          );
 
-      if (!isDoubleOut) {
+          if (!othersClosed) {
+            scoreGain += value * excess;
+          }
+        }
+      });
+
+      updatedPlayers[currentPlayerIndex] = {
+        ...currentPlayer,
+        hits: [...currentPlayer.hits, hits],
+        score: currentPlayer.score + scoreGain,
+        marks,
+      };
+    } else {
+      const scoreBeforeTurn = currentPlayer.score;
+      const scoreThisTurn = hits.reduce(
+        (sum, hit) => sum + hit.value * hit.multiplier,
+        0
+      );
+      const scoreAfterTurn = scoreBeforeTurn - scoreThisTurn;
+      const lastHit = hits[hits.length - 1];
+
+      let isBust = false;
+
+      if (scoreAfterTurn < 0 || scoreAfterTurn === 1) {
         isBust = true;
-      }
-    }
+      } else if (scoreAfterTurn === 0) {
+        const isDoubleOut =
+          (lastHit.value === 25 && lastHit.multiplier === 2) || // Inner bullseye
+          lastHit.multiplier === 2;
 
-    const updatedPlayers = players.map((player, idx) => {
-      if (idx === currentPlayerIndex) {
-        return {
-          ...player,
-          score: isBust ? scoreBeforeTurn : scoreAfterTurn,
-          hits: [...player.hits, hits],
-        };
+        if (!isDoubleOut) {
+          isBust = true;
+        }
       }
-      return player;
-    });
+
+      updatedPlayers = players.map((player, idx) => {
+        if (idx === currentPlayerIndex) {
+          return {
+            ...player,
+            score: isBust ? scoreBeforeTurn : scoreAfterTurn,
+            hits: [...player.hits, hits],
+          };
+        }
+        return player;
+      });
+    }
 
     setPlayers(updatedPlayers);
     setHits([]);
@@ -98,9 +143,10 @@ export default function Game() {
   if (!players.length) return <div style={styles.loading}>Loading game...</div>;
 
   const currentPlayer = players[currentPlayerIndex];
-  const remainingScore =
-    currentPlayer.score -
-    hits.reduce((sum, h) => sum + h.value * h.multiplier, 0);
+  const remainingScore = isCricket
+    ? null
+    : currentPlayer.score -
+      hits.reduce((sum, h) => sum + h.value * h.multiplier, 0);
 
   return (
     <div style={styles.container}>
@@ -132,7 +178,28 @@ export default function Game() {
               .join(", ")
           : "None"}
       </p>
-      <p style={styles.score}>Remaining Score: {remainingScore}</p>
+
+      {/* Show remaining score only if not cricket */}
+      {!isCricket && (
+        <p style={styles.score}>Remaining Score: {remainingScore}</p>
+      )}
+
+      {/* Show Cricket marks if cricket */}
+      {isCricket && (
+        <div style={{ marginTop: 20, fontSize: "1.1rem" }}>
+          <h3>Cricket Marks:</h3>
+          <ul style={{ listStyle: "none", paddingLeft: 0 }}>
+            {Object.entries(currentPlayer.marks).map(([num, count]) => (
+              <li key={num}>
+                {num === "25" ? "Bull" : num}: {count} {count >= 3 ? "✓" : ""}
+              </li>
+            ))}
+          </ul>
+          <p>
+            Score: {currentPlayer.score} (Points from hitting closed numbers)
+          </p>
+        </div>
+      )}
 
       <div style={styles.buttons}>
         <button
@@ -164,15 +231,18 @@ export default function Game() {
         {players.map((p, i) => (
           <li
             key={p.name}
-            style={{
-              fontWeight: i === currentPlayerIndex ? "bold" : "normal",
-            }}
+            style={{ fontWeight: i === currentPlayerIndex ? "bold" : "normal" }}
           >
-            {p.name}: {p.score}
+            {p.name}:{" "}
+            {isCricket
+              ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
+                  .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
+                  .join(" ")}`
+              : `Score: ${p.score}`}
           </li>
         ))}
       </ul>
-      <Link href="/" style={styles.helpLink}>
+      <Link href="/" style={styles.link}>
         ← Reset Game and go to Homepage
       </Link>
     </div>
@@ -205,6 +275,7 @@ const styles = {
   },
   score: {
     fontSize: "1.1rem",
+
     marginTop: 8,
     fontWeight: "bold",
   },

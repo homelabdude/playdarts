@@ -41,19 +41,22 @@ export default function Home() {
         <h2 style={styles.subheading}>A clean, ad-free darts score tracker</h2>
         <p style={styles.description}>
           This is a simple ad-free score tracking app for Darts games. Select
-          your game mode (301 or 501), add players, and start keeping score.
-          Supports up to 4 players in a classic darts match.
+          your game mode (501, 301 and Cricket), add players, and start keeping
+          score. Supports up to 4 players in a classic darts match.
         </p>
 
         <h2 style={styles.subheading}>Select Game Mode</h2>
         <div style={styles.radioGroup}>
-          {[301, 501].map((mode) => (
+          {[301, 501, "Cricket"].map((mode) => (
             <label key={mode} style={styles.radioLabel}>
               <input
                 type="radio"
                 name="mode"
                 value={mode}
-                onChange={(e) => setGameMode(Number(e.target.value))}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  setGameMode(isNaN(Number(value)) ? value : Number(value));
+                }}
                 checked={gameMode === mode}
               />{" "}
               {mode}
