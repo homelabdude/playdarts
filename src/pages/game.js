@@ -244,7 +244,7 @@ export default function Game() {
           className={styles.button}
           style={{
             backgroundColor: "#264653",
-            opacity: hits.length === 0 ? 0.5 : 1,
+            opacity: hits.length >= 3 ? 0.5 : 1,
             marginTop: "10px",
           }}
         >

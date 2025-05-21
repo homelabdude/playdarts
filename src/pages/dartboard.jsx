@@ -30,7 +30,7 @@ function describeArc(cx, cy, radiusInner, radiusOuter, startAngle, endAngle) {
 }
 
 export default function Dartboard({ onHit, disabled }) {
-  const cx = 170;
+  const cx = 165;
   const cy = 165;
 
   // Radii for rings (adjusted)
