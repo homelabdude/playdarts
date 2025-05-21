@@ -49,18 +49,18 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Playdarts.app - Darts Score Tracker</title>
+        <title>Playdarts.app - Darts Score Counter</title>
       </Head>
       <div className={styles.container}>
         <div className={styles.card}>
           <h1 className={styles.heading}>playdarts.app</h1>
           <h2 className={styles.subheading}>
-            A clean, ad-free darts score tracker
+            A clean, ad-free darts score counter
           </h2>
           <p className={styles.description}>
             This is a simple ad-free score tracking app for Darts games. Select
             your game mode (501, 301 and Cricket), add players, and start
-            keeping score. Supports up to 4 players in a classic darts match.
+            keeping score. Supports up to 4 players.
           </p>
 
           <h2 className={styles.subheading}>Select Game Mode</h2>

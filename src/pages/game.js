@@ -217,7 +217,7 @@ export default function Game() {
   return (
     <>
       <Head>
-        <title>Playdarts.app - Darts Score Tracker</title>
+        <title>Playdarts.app - Darts Score Counter</title>
       </Head>
       <Toaster
         position="top-center"

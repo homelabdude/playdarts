@@ -6,10 +6,10 @@ export default function HowToUse() {
   return (
     <>
       <Head>
-        <title>Playdarts.app - Darts Score Tracker</title>
+        <title>Playdarts.app - Darts Score Counter</title>
         <meta
           name="description"
-          content="Learn how to use Playdarts.app Darts Score Tracker app. Mobile friendly, supports 301/501 games, hit detection, and more."
+          content="Learn how to use Playdarts.app Darts score tracker app. Mobile friendly, supports 301/501 games, interactive hit tracking, and more."
         />
       </Head>
       <div className={styles.container}>
@@ -88,7 +88,7 @@ export default function HowToUse() {
           </p>
           <p>
             The game ends when <strong>one player closes all numbers</strong>{" "}
-            and also has the <strong>highest score</strong>. If they’ve closed
+            and also has the <strong>highest score</strong>. If they&apos;ve closed
             all numbers first but another player still has a higher score, the
             game continues until the leading scorer either catches up or that
             leader also closes all numbers.
