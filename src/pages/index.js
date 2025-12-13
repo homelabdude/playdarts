@@ -4,7 +4,7 @@ import Link from "next/link";
 import Head from "next/head";
 import styles from "../styles/Home.module.css";
 
-export default function Home() {
+export default function Home({ theme, toggleTheme }) {
   const router = useRouter();
   const [gameMode, setGameMode] = useState(null);
   const [players, setPlayers] = useState(["", ""]);
@@ -52,6 +52,13 @@ export default function Home() {
         <title>Playdarts.app - Darts Score Counter</title>
       </Head>
       <div className={styles.container}>
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggle}
+          title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+        >
+          {theme === "light" ? "⏾" : "✹"}
+        </button>
         <div className={styles.card}>
           <h1 className={styles.heading}>playdarts.app</h1>
           <h2 className={styles.subheading}>

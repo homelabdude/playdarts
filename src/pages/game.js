@@ -6,7 +6,7 @@ import Head from "next/head";
 import { Toaster, toast } from "react-hot-toast";
 import styles from "../styles/Game.module.css";
 
-export default function Game() {
+export default function Game({ theme, toggleTheme }) {
   const router = useRouter();
   const [players, setPlayers] = useState([]);
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
@@ -206,11 +206,6 @@ export default function Game() {
     return <div className={styles.loading}>Loading game...</div>;
 
   const currentPlayer = players[currentPlayerIndex];
-  const remainingScore = isCricket
-    ? null
-    : currentPlayer.score -
-      hits.reduce((sum, h) => sum + h.value * h.multiplier, 0);
-
   const legsPlayed = players.reduce((sum, p) => sum + p.legs, 0);
   const currentLeg = legsPlayed + 1;
 
@@ -219,39 +214,103 @@ export default function Game() {
       <Head>
         <title>Playdarts.app - Darts Score Counter</title>
       </Head>
-      <Toaster
-        position="top-center"
-        toastOptions={{
-          style: {
-            fontFamily: '"JetBrains Mono", monospace',
-          },
-        }}
-      />
+      <Toaster position="top-center" />
       <div className={styles.container}>
-        <h1 className={styles.title}>Game Mode: {startingScore}</h1>
-        {!isCricket && (
-          <h3 className={styles.legInfo}>
-            Leg {currentLeg} of {totalLegs} - Legs to Win: {legsToWin}
-          </h3>
-        )}
+        <Link href="/" className={styles.backButton} title="Back to home">
+          ←
+        </Link>
+        <button
+          onClick={toggleTheme}
+          className={styles.themeToggle}
+          title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+        >
+          {theme === "light" ? "⏾" : "✹"}
+        </button>
+
+        <div className={styles.playersCard}>
+          <div className={styles.gameInfo}>
+            <span className={styles.gameMode}>Game Mode: {startingScore}</span>
+            {!isCricket && (
+              <span className={styles.legIndicator}>
+                Leg {currentLeg}/{totalLegs}
+              </span>
+            )}
+          </div>
+          <ul className={styles.playersList}>
+            {players.map((p, i) => {
+              const isActive = i === currentPlayerIndex;
+              const currentRemaining = isActive && !isCricket
+                ? p.score - hits.reduce((sum, h) => sum + h.value * h.multiplier, 0)
+                : p.score;
+
+              return (
+                <li
+                  key={p.name}
+                  className={`${styles.playerItem} ${isActive ? styles.activePlayer : ""}`}
+                >
+                  <span className={styles.playerName}>{p.name}</span>
+                  <span className={styles.playerScore}>
+                    {isCricket ? p.score : currentRemaining}
+                  </span>
+                  <span className={styles.playerStats}>
+                    {isCricket ? 'pts' : `${p.legs} legs`}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+
         <h2 className={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
         <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
 
-        <button
-          onClick={() => handleHit({ value: 0, multiplier: 1 })}
-          disabled={hits.length >= 3}
-          className={styles.button}
-          style={{
-            backgroundColor: "#264653",
-            opacity: hits.length >= 3 ? 0.5 : 1,
-            marginTop: "10px",
-          }}
-        >
-          🎯 Miss
-        </button>
+        {isCricket && (
+          <div className={styles.cricketMarks}>
+            <h3 className={styles.cricketHeading}>Cricket Marks</h3>
+            <ul className={styles.marksList}>
+              {Object.entries(currentPlayer.marks).map(([num, count]) => (
+                <li
+                  key={num}
+                  className={`${styles.markItem} ${count >= 3 ? styles.markClosed : ""}`}
+                >
+                  <span>{num === "25" ? "Bull" : num}:</span>
+                  <span>{count}</span>
+                  {count >= 3 && <span className={styles.checkmark}>✓</span>}
+                </li>
+              ))}
+            </ul>
 
-        <p className={styles.hits}>
+            <p className={styles.cricketScore}>
+              Score: {currentPlayer.score} (Points from hitting closed numbers)
+            </p>
+          </div>
+        )}
+
+        <div className={styles.buttons}>
+          <button
+            onClick={() => handleHit({ value: 0, multiplier: 1 })}
+            disabled={hits.length >= 3}
+            className={`${styles.button} ${styles.missButton}`}
+          >
+            🎯 Miss
+          </button>
+          <button
+            onClick={handleConfirmTurn}
+            disabled={hits.length !== 3}
+            className={`${styles.button} ${styles.confirmButton}`}
+          >
+            ✅ OK
+          </button>
+          <button
+            onClick={handleResetTurn}
+            disabled={hits.length === 0}
+            className={`${styles.button} ${styles.resetButton}`}
+          >
+            🔄 Reset
+          </button>
+        </div>
+                <p className={styles.hits}>
           This turn:{" "}
           {hits.length
             ? hits
@@ -261,96 +320,6 @@ export default function Game() {
                 .join(", ")
             : "None"}
         </p>
-
-        {!isCricket && (
-          <p className={styles.score}>Remaining : {remainingScore}</p>
-        )}
-
-        {isCricket && (
-          <div className={{ marginTop: 20, fontSize: "1.1rem" }}>
-            <h3>Cricket Marks</h3>
-            <ul
-              style={{
-                listStyle: "none",
-                paddingLeft: 0,
-                display: "flex",
-                flexWrap: "wrap",
-                gap: "20px",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {Object.entries(currentPlayer.marks).map(([num, count]) => (
-                <li
-                  key={num}
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "6px",
-                    fontWeight: count >= 3 ? "bold" : "normal",
-                    color: count >= 3 ? "#0070f3" : "inherit",
-                  }}
-                >
-                  <span>{num === "25" ? "Bull" : num}:</span>
-                  <span>{count}</span>
-                  {count >= 3 && <span style={{ color: "green" }}>✓</span>}
-                </li>
-              ))}
-            </ul>
-
-            <p>
-              Score: {currentPlayer.score} (Points from hitting closed numbers)
-            </p>
-          </div>
-        )}
-
-        <div className={styles.buttons}>
-          <button
-            onClick={handleConfirmTurn}
-            disabled={hits.length !== 3}
-            className={styles.button}
-            style={{
-              backgroundColor: "#28a745",
-              opacity: hits.length === 3 ? 1 : 0.5,
-            }}
-          >
-            ✅ OK
-          </button>
-          <button
-            onClick={handleResetTurn}
-            disabled={hits.length === 0}
-            className={styles.button}
-            style={{
-              backgroundColor: "#dc3545",
-              opacity: hits.length === 0 ? 0.5 : 1,
-            }}
-          >
-            🔄 Reset
-          </button>
-        </div>
-
-        <h3 style={{ marginTop: 30 }}>🏅 Player Scores</h3>
-        <ul style={{ listStyle: "none", padding: 0 }}>
-          {players.map((p, i) => (
-            <li
-              key={p.name}
-              style={{
-                fontWeight: i === currentPlayerIndex ? "bold" : "normal",
-              }}
-            >
-              {p.name}:{" "}
-              {isCricket
-                ? `Score: ${p.score}, Marks: ${Object.entries(p.marks)
-                    .map(([n, m]) => `${n === "25" ? "Bull" : n}:${m}`)
-                    .join(" ")}`
-                : `Score: ${p.score}, Legs: ${p.legs}`}
-            </li>
-          ))}
-        </ul>
-
-        <Link href="/" className={styles.link}>
-          ← Reset Game and go to Homepage
-        </Link>
       </div>
     </>
   );

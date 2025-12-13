@@ -53,12 +53,20 @@ export default function Dartboard({ onHit, disabled }) {
 
   return (
     <svg
-      width={380}
-      height={380}
+      width="100%"
+      height="auto"
       viewBox="0 0 350 350"
-      style={{ display: "block", margin: "auto" }}
+      style={{
+        display: "block",
+        margin: "12px auto",
+        filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))",
+        borderRadius: "50%",
+        maxWidth: "340px",
+        width: "100%",
+      }}
     >
-      <circle cx={cx} cy={cy} r={radiusDoubleOuter} fill="#222" />
+      <circle cx={cx} cy={cy} r={radiusDoubleOuter + 5} fill="#0f172a" />
+      <circle cx={cx} cy={cy} r={radiusDoubleOuter} fill="#1e293b" />
 
       {SECTORS.map((value, i) => {
         const startAngle = i * SECTOR_ANGLE - 90;
@@ -102,44 +110,84 @@ export default function Dartboard({ onHit, disabled }) {
           endAngle
         );
 
-        const doubleColor = isDark ? "#d32f2f" : "#ffebee";
-        const tripleColor = isDark ? "#d32f2f" : "#ffebee";
-        const singleDarkColor = isDark ? "#111" : "#fff";
-        const singleLightColor = isDark ? "#444" : "#eee";
+        const doubleColor = isDark ? "#dc2626" : "#fef2f2";
+        const tripleColor = isDark ? "#dc2626" : "#fef2f2";
+        const singleDarkColor = isDark ? "#0f172a" : "#f8fafc";
+        const singleLightColor = isDark ? "#334155" : "#e2e8f0";
 
         return (
           <g key={i}>
             <path
               d={doublePath}
               fill={doubleColor}
-              stroke="#222"
-              strokeWidth="0.5"
+              stroke="#0f172a"
+              strokeWidth="0.8"
               onClick={() => handleClick(value, 2)}
-              style={{ cursor: disabled ? "default" : "pointer" }}
+              style={{
+                cursor: disabled ? "default" : "pointer",
+                transition: "opacity 0.15s ease",
+                opacity: disabled ? 0.6 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!disabled) e.target.style.opacity = "0.85";
+              }}
+              onMouseLeave={(e) => {
+                if (!disabled) e.target.style.opacity = "1";
+              }}
             />
             <path
               d={singleOuterPath}
               fill={singleLightColor}
-              stroke="#222"
-              strokeWidth="0.5"
+              stroke="#0f172a"
+              strokeWidth="0.8"
               onClick={() => handleClick(value, 1)}
-              style={{ cursor: disabled ? "default" : "pointer" }}
+              style={{
+                cursor: disabled ? "default" : "pointer",
+                transition: "opacity 0.15s ease",
+                opacity: disabled ? 0.6 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!disabled) e.target.style.opacity = "0.85";
+              }}
+              onMouseLeave={(e) => {
+                if (!disabled) e.target.style.opacity = "1";
+              }}
             />
             <path
               d={triplePath}
               fill={tripleColor}
-              stroke="#222"
-              strokeWidth="0.5"
+              stroke="#0f172a"
+              strokeWidth="0.8"
               onClick={() => handleClick(value, 3)}
-              style={{ cursor: disabled ? "default" : "pointer" }}
+              style={{
+                cursor: disabled ? "default" : "pointer",
+                transition: "opacity 0.15s ease",
+                opacity: disabled ? 0.6 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!disabled) e.target.style.opacity = "0.85";
+              }}
+              onMouseLeave={(e) => {
+                if (!disabled) e.target.style.opacity = "1";
+              }}
             />
             <path
               d={singleInnerPath}
               fill={singleDarkColor}
-              stroke="#222"
-              strokeWidth="0.5"
+              stroke="#0f172a"
+              strokeWidth="0.8"
               onClick={() => handleClick(value, 1)}
-              style={{ cursor: disabled ? "default" : "pointer" }}
+              style={{
+                cursor: disabled ? "default" : "pointer",
+                transition: "opacity 0.15s ease",
+                opacity: disabled ? 0.6 : 1,
+              }}
+              onMouseEnter={(e) => {
+                if (!disabled) e.target.style.opacity = "0.85";
+              }}
+              onMouseLeave={(e) => {
+                if (!disabled) e.target.style.opacity = "1";
+              }}
             />
           </g>
         );
@@ -149,22 +197,42 @@ export default function Dartboard({ onHit, disabled }) {
         cx={cx}
         cy={cy}
         r={radiusOuterBull}
-        fill="#00b894"
-        stroke="#222"
-        strokeWidth="1"
+        fill="#10b981"
+        stroke="#0f172a"
+        strokeWidth="1.5"
         onClick={() => handleClick(25, 1)}
-        style={{ cursor: disabled ? "default" : "pointer" }}
+        style={{
+          cursor: disabled ? "default" : "pointer",
+          transition: "opacity 0.15s ease",
+          opacity: disabled ? 0.6 : 1,
+        }}
+        onMouseEnter={(e) => {
+          if (!disabled) e.target.style.opacity = "0.85";
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled) e.target.style.opacity = "1";
+        }}
       />
 
       <circle
         cx={cx}
         cy={cy}
         r={radiusBull}
-        fill="#d32f2f"
-        stroke="#222"
-        strokeWidth="1"
+        fill="#dc2626"
+        stroke="#0f172a"
+        strokeWidth="1.5"
         onClick={() => handleClick(50, 1)}
-        style={{ cursor: disabled ? "default" : "pointer" }}
+        style={{
+          cursor: disabled ? "default" : "pointer",
+          transition: "opacity 0.15s ease",
+          opacity: disabled ? 0.6 : 1,
+        }}
+        onMouseEnter={(e) => {
+          if (!disabled) e.target.style.opacity = "0.85";
+        }}
+        onMouseLeave={(e) => {
+          if (!disabled) e.target.style.opacity = "1";
+        }}
       />
 
       {/* Number placement */}
@@ -182,10 +250,13 @@ export default function Dartboard({ onHit, disabled }) {
             y={textPos.y + 6}
             fontSize="18"
             fontWeight="bold"
-            fill="#111"
+            fill="#f8fafc"
             textAnchor="middle"
             pointerEvents="none"
-            style={{ userSelect: "none" }}
+            style={{
+              userSelect: "none",
+              filter: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))",
+            }}
           >
             {value}
           </text>
