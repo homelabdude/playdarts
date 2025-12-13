@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import Head from "next/head";
@@ -9,8 +9,17 @@ export default function Home({ theme, toggleTheme }) {
   const [gameMode, setGameMode] = useState(null);
   const [players, setPlayers] = useState(["", ""]);
   const [legs, setLegs] = useState(1);
+  const [hasSavedGame, setHasSavedGame] = useState(false);
   const maxPlayers = 4;
   const maxLegs = 7;
+
+  const STORAGE_KEY = "playdarts_game_state";
+
+  useEffect(() => {
+    // Check if there's a saved game in sessionStorage
+    const savedState = sessionStorage.getItem(STORAGE_KEY);
+    setHasSavedGame(!!savedState);
+  }, []);
 
   const handleAddPlayer = () => {
     if (players.length < maxPlayers) {
@@ -30,6 +39,9 @@ export default function Home({ theme, toggleTheme }) {
       players.every((p) => p.trim() !== "") &&
       players.length >= 2
     ) {
+      // Clear any saved game when starting a new one
+      sessionStorage.removeItem(STORAGE_KEY);
+
       const query = {
         mode: gameMode,
         players: JSON.stringify(players),
@@ -43,6 +55,10 @@ export default function Home({ theme, toggleTheme }) {
     }
   };
 
+  const handleContinueGame = () => {
+    router.push("/game");
+  };
+
   const startButtonEnabled =
     gameMode && players.every((p) => p.trim() !== "") && players.length >= 2;
 
@@ -50,25 +66,40 @@ export default function Home({ theme, toggleTheme }) {
     <>
       <Head>
         <title>Playdarts.app - Darts Score Counter</title>
+        <meta
+          name="viewport"
+          content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+        />
       </Head>
       <div className={styles.container}>
         <button
           onClick={toggleTheme}
           className={styles.themeToggle}
-          title={theme === "light" ? "Switch to dark mode" : "Switch to light mode"}
+          title={
+            theme === "light" ? "Switch to dark mode" : "Switch to light mode"
+          }
         >
           {theme === "light" ? "⏾" : "✹"}
         </button>
         <div className={styles.card}>
           <h1 className={styles.heading}>playdarts.app</h1>
           <h2 className={styles.subheading}>
-            A clean, ad-free darts score counter
+            A simple open-source darts score counter
           </h2>
           <p className={styles.description}>
-            This is a simple ad-free score tracking app for Darts games. Select
+            This is an open-source, ad-free score tracking app for Darts games. Select
             your game mode (501, 301 and Cricket), add players, and start
             keeping score. Supports up to 4 players.
           </p>
+
+          {hasSavedGame && (
+            <button
+              onClick={handleContinueGame}
+              className={styles.continueButton}
+            >
+              🎯 Continue Previous Game
+            </button>
+          )}
 
           <h2 className={styles.subheading}>Select Game Mode</h2>
           <div className={styles.radioGroup}>
@@ -161,6 +192,12 @@ export default function Home({ theme, toggleTheme }) {
 
           <Link href="/how-to-use" className={styles.helpLink}>
             📘 How to use
+          </Link>
+          <Link href="https://github.com/homelabdude/playdarts/issues" className={styles.helpLink}>
+            🐛 Report a bug
+          </Link>
+          <Link href="/terms-of-service" className={styles.helpLink}>
+            📜 Terms of Service
           </Link>
         </div>
       </div>

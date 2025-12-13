@@ -196,6 +196,8 @@
   margin-bottom: 10px;
   padding-bottom: 8px;
   border-bottom: 2px solid var(--border-color);
+  gap: 8px;
+  flex-wrap: wrap;
 }
 
 .gameMode {
@@ -214,6 +216,29 @@
   padding: 4px 10px;
   background-color: var(--bg-light);
   border-radius: 6px;
+}
+
+.newGameButton {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 4px 12px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.newGameButton:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.newGameButton:active {
+  transform: translateY(0);
 }
 
 .playersList {
@@ -363,6 +388,11 @@
   .legIndicator {
     font-size: 0.7rem;
     padding: 3px 8px;
+  }
+
+  .newGameButton {
+    font-size: 0.7rem;
+    padding: 3px 10px;
   }
 
   .playersList {

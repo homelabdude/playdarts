@@ -1,7 +1,6 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import Dartboard from "./dartboard";
-import Link from "next/link";
 import Head from "next/head";
 import { Toaster, toast } from "react-hot-toast";
 import styles from "../styles/Game.module.css";
@@ -16,32 +15,149 @@ export default function Game({ theme, toggleTheme }) {
   const [totalLegs, setTotalLegs] = useState(1);
   const isCricket = startingScore === "Cricket";
 
+  const STORAGE_KEY = "playdarts_game_state";
+
+  // Validation functions
+  const VALID_GAME_MODES = ["301", "501", "Cricket"];
+  const MAX_LEGS = 7;
+  const MAX_PLAYERS = 8;
+  const MAX_NAME_LENGTH = 10;
+
+  const validateGameMode = (mode) => {
+    return VALID_GAME_MODES.includes(String(mode)) ? String(mode) : "501";
+  };
+
+  const validateLegs = (legs) => {
+    const numLegs = Number(legs);
+    if (isNaN(numLegs) || numLegs < 1 || numLegs > MAX_LEGS) {
+      return 1;
+    }
+    return Math.floor(numLegs);
+  };
+
+  const validatePlayers = (players) => {
+    if (!Array.isArray(players)) return null;
+    if (players.length < 1 || players.length > MAX_PLAYERS) return null;
+
+    const validPlayers = players.filter(
+      (name) => typeof name === "string" && name.trim().length > 0
+    );
+
+    if (validPlayers.length === 0) return null;
+    return validPlayers.map((name) => String(name).slice(0, MAX_NAME_LENGTH));
+  };
+
+  const validateGameState = (state) => {
+    if (!state || typeof state !== "object") return null;
+
+    const { players, currentPlayerIndex, hits, startingScore, legsToWin, totalLegs } = state;
+
+    // Validate players array
+    if (!Array.isArray(players) || players.length === 0) return null;
+
+    // Validate each player object structure
+    const validPlayers = players.every((p) => {
+      if (!p || typeof p !== "object") return false;
+      if (typeof p.name !== "string" || p.name.length === 0) return false;
+      if (typeof p.score !== "number" || p.score < 0) return false;
+      if (!Array.isArray(p.hits)) return false;
+      if (typeof p.legs !== "number" || p.legs < 0) return false;
+      return true;
+    });
+
+    if (!validPlayers) return null;
+
+    // Validate numeric values
+    if (typeof currentPlayerIndex !== "number" || currentPlayerIndex < 0 || currentPlayerIndex >= players.length) return null;
+    if (!Array.isArray(hits)) return null;
+    if (typeof legsToWin !== "number" || legsToWin < 1) return null;
+    if (typeof totalLegs !== "number" || totalLegs < 1) return null;
+
+    // Validate startingScore is either a number or "Cricket"
+    if (startingScore !== "Cricket" && (typeof startingScore !== "number" || startingScore <= 0)) return null;
+
+    return state;
+  };
+
+  // Save game state to sessionStorage
+  useEffect(() => {
+    if (players.length > 0) {
+      const gameState = {
+        players,
+        currentPlayerIndex,
+        hits,
+        startingScore,
+        legsToWin,
+        totalLegs,
+      };
+      sessionStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
+    }
+  }, [players, currentPlayerIndex, hits, startingScore, legsToWin, totalLegs]);
+
+  // Initialize game state from sessionStorage or URL params
   useEffect(() => {
     if (!router.isReady) return;
 
+    // Try to restore from sessionStorage first
+    const savedState = sessionStorage.getItem(STORAGE_KEY);
+    if (savedState) {
+      try {
+        const gameState = JSON.parse(savedState);
+        const validatedState = validateGameState(gameState);
+
+        if (validatedState) {
+          setPlayers(validatedState.players);
+          setCurrentPlayerIndex(validatedState.currentPlayerIndex);
+          setHits(validatedState.hits);
+          setStartingScore(validatedState.startingScore);
+          setLegsToWin(validatedState.legsToWin);
+          setTotalLegs(validatedState.totalLegs);
+          return;
+        } else {
+          sessionStorage.removeItem(STORAGE_KEY);
+        }
+      } catch (e) {
+        sessionStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    // If no saved state, initialize from URL params
     const { mode, players: rawPlayers, legs } = router.query;
+
+    if (!mode || !rawPlayers || !legs) {
+      router.push("/");
+      return;
+    }
 
     try {
       const parsedPlayers = JSON.parse(rawPlayers);
-      const cricketMode = mode === "Cricket";
-      const totalLegsFromParam = Number(legs) || 1;
+      const validatedPlayers = validatePlayers(parsedPlayers);
 
-      setTotalLegs(totalLegsFromParam);
+      if (!validatedPlayers) {
+        router.push("/");
+        return;
+      }
+
+      const validatedMode = validateGameMode(mode);
+      const validatedLegs = validateLegs(legs);
+      const cricketMode = validatedMode === "Cricket";
+
+      setTotalLegs(validatedLegs);
 
       // For cricket mode, legsToWin = totalLegs (usually 1)
       // For 301/501 modes, legsToWin = majority of total legs (best of N)
       if (cricketMode) {
-        setLegsToWin(totalLegsFromParam);
+        setLegsToWin(validatedLegs);
         setStartingScore("Cricket");
       } else {
-        setStartingScore(Number(mode) || 501);
-        setLegsToWin(Math.ceil(totalLegsFromParam / 2));
+        setStartingScore(Number(validatedMode));
+        setLegsToWin(Math.ceil(validatedLegs / 2));
       }
 
       setPlayers(
-        parsedPlayers.map((name) => ({
-          name: name.slice(0, 10),
-          score: cricketMode ? 0 : Number(mode) || 501,
+        validatedPlayers.map((name) => ({
+          name: name,
+          score: cricketMode ? 0 : Number(validatedMode),
           hits: [],
           legs: 0,
           marks: cricketMode
@@ -58,7 +174,7 @@ export default function Game({ theme, toggleTheme }) {
         }))
       );
     } catch (e) {
-      console.error("Failed to parse query params", e);
+      router.push("/");
     }
   }, [router.isReady, router.query]);
 
@@ -127,6 +243,30 @@ export default function Game({ theme, toggleTheme }) {
         }
         return p;
       });
+
+      // Check for Cricket win: all numbers closed AND highest score
+      const currentPlayerUpdated = updatedPlayers[currentPlayerIndex];
+      const allNumbersClosed = Object.values(currentPlayerUpdated.marks).every(
+        (count) => count >= 3
+      );
+
+      if (allNumbersClosed) {
+        const maxScore = Math.max(...updatedPlayers.map((p) => p.score));
+        const playersWithMaxScore = updatedPlayers.filter(
+          (p) => p.score === maxScore
+        );
+
+        // Win if this player has the highest score (and it's unique)
+        if (
+          currentPlayerUpdated.score === maxScore &&
+          playersWithMaxScore.length === 1
+        ) {
+          toast.success(`${currentPlayer.name} wins!`, {
+            duration: 4000,
+          });
+          setTimeout(() => router.push("/"), 4200);
+        }
+      }
     } else {
       // 301 or 501 mode logic
       const scoreBeforeTurn = currentPlayer.score;
@@ -143,9 +283,7 @@ export default function Game({ theme, toggleTheme }) {
       if (scoreAfterTurn < 0 || scoreAfterTurn === 1) {
         isBust = true;
       } else if (scoreAfterTurn === 0) {
-        const isDoubleOut =
-          (lastHit.value === 25 && lastHit.multiplier === 2) ||
-          lastHit.multiplier === 2;
+        const isDoubleOut = lastHit.multiplier === 2;
 
         if (!isDoubleOut) {
           isBust = true;
@@ -202,6 +340,16 @@ export default function Game({ theme, toggleTheme }) {
     setHits([]);
   };
 
+  const handleBackButton = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    router.push("/");
+  };
+
+  const handleNewGame = () => {
+    sessionStorage.removeItem(STORAGE_KEY);
+    router.push("/");
+  };
+
   if (!players.length)
     return <div className={styles.loading}>Loading game...</div>;
 
@@ -213,12 +361,13 @@ export default function Game({ theme, toggleTheme }) {
     <>
       <Head>
         <title>Playdarts.app - Darts Score Counter</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
       <Toaster position="top-center" />
       <div className={styles.container}>
-        <Link href="/" className={styles.backButton} title="Back to home">
+        <button onClick={handleBackButton} className={styles.backButton} title="Back to home">
           ←
-        </Link>
+        </button>
         <button
           onClick={toggleTheme}
           className={styles.themeToggle}
@@ -235,6 +384,9 @@ export default function Game({ theme, toggleTheme }) {
                 Leg {currentLeg}/{totalLegs}
               </span>
             )}
+            <button onClick={handleNewGame} className={styles.newGameButton} title="Start a new game">
+              New Game
+            </button>
           </div>
           <ul className={styles.playersList}>
             {players.map((p, i) => {
@@ -245,7 +397,7 @@ export default function Game({ theme, toggleTheme }) {
 
               return (
                 <li
-                  key={p.name}
+                  key={i}
                   className={`${styles.playerItem} ${isActive ? styles.activePlayer : ""}`}
                 >
                   <span className={styles.playerName}>{p.name}</span>
@@ -310,7 +462,7 @@ export default function Game({ theme, toggleTheme }) {
             🔄 Reset
           </button>
         </div>
-                <p className={styles.hits}>
+        <p className={styles.hits}>
           This turn:{" "}
           {hits.length
             ? hits

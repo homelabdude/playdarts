@@ -187,6 +187,41 @@
   background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
 }
 
+.continueButton {
+  width: 100%;
+  padding: 14px 20px;
+  font-size: 1.05rem;
+  background: linear-gradient(135deg, #10b981, #059669);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-lg);
+  margin-bottom: 1.5rem;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 4px 6px -1px rgba(16, 185, 129, 0.3), 0 2px 4px -1px rgba(16, 185, 129, 0.2);
+  }
+  50% {
+    box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.4), 0 4px 6px -2px rgba(16, 185, 129, 0.3);
+  }
+}
+
+.continueButton:hover {
+  background: linear-gradient(135deg, #059669, #047857);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-xl);
+}
+
+.continueButton:active {
+  transform: translateY(0);
+}
+
 .startButton {
   width: 100%;
   padding: 12px 20px;
@@ -319,6 +354,11 @@
 
   .startButton {
     padding: 11px 18px;
+    font-size: 0.95rem;
+  }
+
+  .continueButton {
+    padding: 12px 18px;
     font-size: 0.95rem;
   }
 }
