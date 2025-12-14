@@ -18,6 +18,28 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run semantic-release
+        id: semantic
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
+
+      - name: Get version from latest tag
+        id: version
+        run: |
+          VERSION=$(git describe --tags --abbrev=0 2>/dev/null || echo "0.1.0")
+          echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU (for cross-building)
         uses: docker/setup-qemu-action@v3
@@ -39,5 +61,7 @@ jobs:
         with:
           context: .
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/playdarts:latest
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/playdarts:latest
+            ghcr.io/${{ github.repository_owner }}/playdarts:${{ steps.version.outputs.version }}
           platforms: linux/amd64,linux/arm64

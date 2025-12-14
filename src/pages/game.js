@@ -264,7 +264,10 @@ export default function Game({ theme, toggleTheme }) {
           toast.success(`${currentPlayer.name} wins!`, {
             duration: 4000,
           });
-          setTimeout(() => router.push("/"), 4200);
+          setTimeout(() => {
+            sessionStorage.removeItem(STORAGE_KEY);
+            router.push("/");
+          }, 4200);
         }
       }
     } else {
@@ -321,7 +324,10 @@ export default function Game({ theme, toggleTheme }) {
           toast.success(`${currentPlayer.name} wins the match!`, {
             duration: 4000,
           });
-          setTimeout(() => router.push("/"), 4200);
+          setTimeout(() => {
+            sessionStorage.removeItem(STORAGE_KEY);
+            router.push("/");
+          }, 4200);
         } else {
           toast(`${currentPlayer.name} wins leg ${currentLeg}!`, {
             duration: 4000,
