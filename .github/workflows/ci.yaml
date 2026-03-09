@@ -44,7 +44,7 @@ jobs:
           echo "version=${VERSION#v}" >> $GITHUB_OUTPUT
 
       - name: Set up QEMU (for cross-building)
-        uses: docker/setup-qemu-action@v3
+        uses: docker/setup-qemu-action@v4
         with:
           platforms: arm64,amd64
 
