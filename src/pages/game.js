@@ -13,6 +13,7 @@ export default function Game({ theme, toggleTheme }) {
   const [startingScore, setStartingScore] = useState(501);
   const [legsToWin, setLegsToWin] = useState(1);
   const [totalLegs, setTotalLegs] = useState(1);
+  const [winner, setWinner] = useState(null);
   const isCricket = startingScore === "Cricket";
 
   const STORAGE_KEY = "playdarts_game_state";
@@ -81,7 +82,7 @@ export default function Game({ theme, toggleTheme }) {
 
   // Save game state to sessionStorage
   useEffect(() => {
-    if (players.length > 0) {
+    if (players.length > 0 && !winner) {
       const gameState = {
         players,
         currentPlayerIndex,
@@ -92,7 +93,7 @@ export default function Game({ theme, toggleTheme }) {
       };
       sessionStorage.setItem(STORAGE_KEY, JSON.stringify(gameState));
     }
-  }, [players, currentPlayerIndex, hits, startingScore, legsToWin, totalLegs]);
+  }, [players, currentPlayerIndex, hits, startingScore, legsToWin, totalLegs, winner]);
 
   // Initialize game state from sessionStorage or URL params
   useEffect(() => {
@@ -261,13 +262,8 @@ export default function Game({ theme, toggleTheme }) {
           currentPlayerUpdated.score === maxScore &&
           playersWithMaxScore.length === 1
         ) {
-          toast.success(`${currentPlayer.name} wins!`, {
-            duration: 4000,
-          });
-          setTimeout(() => {
-            sessionStorage.removeItem(STORAGE_KEY);
-            router.push("/");
-          }, 4200);
+          sessionStorage.removeItem(STORAGE_KEY);
+          setWinner(currentPlayer.name);
         }
       }
     } else {
@@ -321,13 +317,8 @@ export default function Game({ theme, toggleTheme }) {
         }));
 
         if (newLegCount >= legsToWin) {
-          toast.success(`${currentPlayer.name} wins the match!`, {
-            duration: 4000,
-          });
-          setTimeout(() => {
-            sessionStorage.removeItem(STORAGE_KEY);
-            router.push("/");
-          }, 4200);
+          sessionStorage.removeItem(STORAGE_KEY);
+          setWinner(currentPlayer.name);
         } else {
           toast(`${currentPlayer.name} wins leg ${currentLeg}!`, {
             duration: 4000,
@@ -370,6 +361,49 @@ export default function Game({ theme, toggleTheme }) {
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
       </Head>
       <Toaster position="top-center" />
+      {winner && (
+        <div className={styles.winnerOverlay}>
+          <div className={styles.winnerCard}>
+            <svg
+              className={styles.trophyIcon}
+              viewBox="0 0 64 64"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              <path
+                d="M32 42c-10 0-18-8-18-18V8h36v16c0 10-8 18-18 18z"
+                fill="currentColor"
+                opacity="0.9"
+              />
+              <path
+                d="M14 10H6a4 4 0 000 8c2 4 6 7 8 8"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <path
+                d="M50 10h8a4 4 0 010 8c-2 4-6 7-8 8"
+                stroke="currentColor"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                fill="none"
+              />
+              <rect x="26" y="42" width="12" height="8" rx="2" fill="currentColor" opacity="0.7" />
+              <rect x="20" y="50" width="24" height="5" rx="2.5" fill="currentColor" />
+            </svg>
+            <h2 className={styles.winnerTitle}>We have a winner!</h2>
+            <p className={styles.winnerName}>{winner}</p>
+            <button
+              className={styles.goHomeButton}
+              onClick={() => router.push("/")}
+            >
+              Go Home
+            </button>
+          </div>
+        </div>
+      )}
       <div className={styles.container}>
         <button onClick={handleBackButton} className={styles.backButton} title="Back to home">
           ←
