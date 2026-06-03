@@ -191,10 +191,24 @@ export default function Game({ theme, toggleTheme }) {
 
   const handleHit = (hit) => {
     if (hits.length >= 3) return;
-    setHits([...hits, hit]);
+    const newHits = [...hits, hit];
+
+    if (!isCricket) {
+      const currentPlayer = players[currentPlayerIndex];
+      let runningScore = currentPlayer.score;
+      for (const h of newHits) {
+        runningScore -= h.value * h.multiplier;
+        if (runningScore === 0 && h.multiplier === 2) {
+          handleConfirmTurn(newHits);
+          return;
+        }
+      }
+    }
+
+    setHits(newHits);
   };
 
-  const handleConfirmTurn = () => {
+  const handleConfirmTurn = (hitsToProcess = hits) => {
     const currentPlayer = players[currentPlayerIndex];
     let updatedPlayers = [...players];
 
@@ -205,7 +219,7 @@ export default function Game({ theme, toggleTheme }) {
 
       // Count hits per number in this turn
       const hitsCountThisTurn = {};
-      hits.forEach(({ value, multiplier }) => {
+      hitsToProcess.forEach(({ value, multiplier }) => {
         if (numbers.includes(value)) {
           hitsCountThisTurn[value] =
             (hitsCountThisTurn[value] || 0) + multiplier;
@@ -239,7 +253,7 @@ export default function Game({ theme, toggleTheme }) {
             ...p,
             marks: updatedMarks,
             score: p.score + scoreGain,
-            hits: [...p.hits, hits],
+            hits: [...p.hits, hitsToProcess],
           };
         }
         return p;
@@ -269,12 +283,12 @@ export default function Game({ theme, toggleTheme }) {
     } else {
       // 301 or 501 mode logic
       const scoreBeforeTurn = currentPlayer.score;
-      const scoreThisTurn = hits.reduce(
+      const scoreThisTurn = hitsToProcess.reduce(
         (sum, hit) => sum + hit.value * hit.multiplier,
         0
       );
       const scoreAfterTurn = scoreBeforeTurn - scoreThisTurn;
-      const lastHit = hits[hits.length - 1];
+      const lastHit = hitsToProcess[hitsToProcess.length - 1];
 
       let isBust = false;
       let wonLeg = false;
@@ -300,7 +314,7 @@ export default function Game({ theme, toggleTheme }) {
               : wonLeg
               ? startingScore
               : scoreAfterTurn,
-            hits: [...player.hits, hits],
+            hits: [...player.hits, hitsToProcess],
             legs: wonLeg ? player.legs + 1 : player.legs,
           };
         }
@@ -416,9 +430,10 @@ export default function Game({ theme, toggleTheme }) {
           {theme === "light" ? "⏾" : "✹"}
         </button>
 
-        <div className={styles.playersCard}>
-          <div className={styles.gameInfo}>
-            <span className={styles.gameMode}>Game Mode: {startingScore}</span>
+        {/* Scorebar: full-width strip, single row regardless of player count */}
+        <div className={styles.scorebar}>
+          <div className={styles.scorebarMeta}>
+            <span className={styles.gameMode}>{startingScore}</span>
             {!isCricket && (
               <span className={styles.legIndicator}>
                 Leg {currentLeg}/{totalLegs}
@@ -445,7 +460,7 @@ export default function Game({ theme, toggleTheme }) {
                     {isCricket ? p.score : currentRemaining}
                   </span>
                   <span className={styles.playerStats}>
-                    {isCricket ? 'pts' : `${p.legs} legs`}
+                    {isCricket ? "pts" : `${p.legs}L`}
                   </span>
                 </li>
               );
@@ -453,65 +468,77 @@ export default function Game({ theme, toggleTheme }) {
           </ul>
         </div>
 
-        <h2 className={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
+        {/* Board + action controls */}
+        <div className={styles.gameLayout}>
+          <div className={styles.controlPanel}>
+            <h2 className={styles.turn}>🎯 {currentPlayer.name}&apos;s turn</h2>
 
-        <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
+            <div className={styles.dartSlots}>
+              {[0, 1, 2].map((i) => {
+                const h = hits[i];
+                const slotClass = h
+                  ? h.value === 0
+                    ? `${styles.dartSlot} ${styles.dartSlotMiss}`
+                    : `${styles.dartSlot} ${styles.dartSlotFilled}`
+                  : styles.dartSlot;
+                return (
+                  <div key={i} className={slotClass}>
+                    {h ? (h.value === 0 ? "Miss" : `${h.value}×${h.multiplier}`) : "—"}
+                  </div>
+                );
+              })}
+            </div>
 
-        {isCricket && (
-          <div className={styles.cricketMarks}>
-            <h3 className={styles.cricketHeading}>Cricket Marks</h3>
-            <ul className={styles.marksList}>
-              {Object.entries(currentPlayer.marks).map(([num, count]) => (
-                <li
-                  key={num}
-                  className={`${styles.markItem} ${count >= 3 ? styles.markClosed : ""}`}
-                >
-                  <span>{num === "25" ? "Bull" : num}:</span>
-                  <span>{count}</span>
-                  {count >= 3 && <span className={styles.checkmark}>✓</span>}
-                </li>
-              ))}
-            </ul>
+            <div className={styles.buttons}>
+              <button
+                onClick={() => handleHit({ value: 0, multiplier: 1 })}
+                disabled={hits.length >= 3}
+                className={`${styles.button} ${styles.missButton}`}
+              >
+                🎯 Miss
+              </button>
+              <button
+                onClick={() => handleConfirmTurn()}
+                disabled={hits.length !== 3}
+                className={`${styles.button} ${styles.confirmButton}`}
+              >
+                ✅ OK
+              </button>
+              <button
+                onClick={handleResetTurn}
+                disabled={hits.length === 0}
+                className={`${styles.button} ${styles.resetButton}`}
+              >
+                🔄 Reset
+              </button>
+            </div>
 
-            <p className={styles.cricketScore}>
-              Score: {currentPlayer.score} (Points from hitting closed numbers)
-            </p>
+            {isCricket && (
+              <div className={styles.cricketMarks}>
+                <h3 className={styles.cricketHeading}>Cricket Marks</h3>
+                <ul className={styles.marksList}>
+                  {Object.entries(currentPlayer.marks).map(([num, count]) => (
+                    <li
+                      key={num}
+                      className={`${styles.markItem} ${count >= 3 ? styles.markClosed : ""}`}
+                    >
+                      <span>{num === "25" ? "Bull" : num}:</span>
+                      <span>{count}</span>
+                      {count >= 3 && <span className={styles.checkmark}>✓</span>}
+                    </li>
+                  ))}
+                </ul>
+                <p className={styles.cricketScore}>
+                  Score: {currentPlayer.score} (Points from hitting closed numbers)
+                </p>
+              </div>
+            )}
           </div>
-        )}
 
-        <div className={styles.buttons}>
-          <button
-            onClick={() => handleHit({ value: 0, multiplier: 1 })}
-            disabled={hits.length >= 3}
-            className={`${styles.button} ${styles.missButton}`}
-          >
-            🎯 Miss
-          </button>
-          <button
-            onClick={handleConfirmTurn}
-            disabled={hits.length !== 3}
-            className={`${styles.button} ${styles.confirmButton}`}
-          >
-            ✅ OK
-          </button>
-          <button
-            onClick={handleResetTurn}
-            disabled={hits.length === 0}
-            className={`${styles.button} ${styles.resetButton}`}
-          >
-            🔄 Reset
-          </button>
+          <div className={styles.boardPanel}>
+            <Dartboard onHit={handleHit} disabled={hits.length >= 3} />
+          </div>
         </div>
-        <p className={styles.hits}>
-          This turn:{" "}
-          {hits.length
-            ? hits
-                .map((h) =>
-                  h.value === 0 ? "Miss" : `${h.value}×${h.multiplier}`
-                )
-                .join(", ")
-            : "None"}
-        </p>
       </div>
     </>
   );

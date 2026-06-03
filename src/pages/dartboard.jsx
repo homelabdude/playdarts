@@ -30,8 +30,8 @@ function describeArc(cx, cy, radiusInner, radiusOuter, startAngle, endAngle) {
 }
 
 export default function Dartboard({ onHit, disabled }) {
-  const cx = 165;
-  const cy = 165;
+  const cx = 175;
+  const cy = 175;
 
   // Radii for rings (adjusted)
   const radiusDoubleOuter = 140;
@@ -61,7 +61,7 @@ export default function Dartboard({ onHit, disabled }) {
         margin: "12px auto",
         filter: "drop-shadow(0 8px 16px rgba(0, 0, 0, 0.12))",
         borderRadius: "50%",
-        maxWidth: "340px",
+        maxWidth: "min(330px, 100%)",
         width: "100%",
       }}
     >
@@ -221,7 +221,7 @@ export default function Dartboard({ onHit, disabled }) {
         fill="#dc2626"
         stroke="#0f172a"
         strokeWidth="1.5"
-        onClick={() => handleClick(50, 1)}
+        onClick={() => handleClick(25, 2)}
         style={{
           cursor: disabled ? "default" : "pointer",
           transition: "opacity 0.15s ease",
@@ -250,13 +250,10 @@ export default function Dartboard({ onHit, disabled }) {
             y={textPos.y + 6}
             fontSize="18"
             fontWeight="bold"
-            fill="#f8fafc"
+            fill="currentColor"
             textAnchor="middle"
             pointerEvents="none"
-            style={{
-              userSelect: "none",
-              filter: "drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))",
-            }}
+            style={{ userSelect: "none" }}
           >
             {value}
           </text>

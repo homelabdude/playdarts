@@ -4,14 +4,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--bg-light);
   padding: 16px;
 }
 
 .card {
   width: 100%;
   max-width: 480px;
-  background-color: var(--bg-card);
+  background: var(--bg-card-gradient);
   padding: 1.5rem;
   border-radius: 1rem;
   box-shadow: var(--shadow-lg);
@@ -76,7 +75,7 @@
 
 .radioLabel:hover {
   border-color: var(--accent-color);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.06));
 }
 
 .radioLabel input[type="radio"] {
@@ -88,7 +87,7 @@
 
 .radioLabel:has(input[type="radio"]:checked) {
   border-color: var(--accent-color);
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15));
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.12), rgba(14, 165, 233, 0.1));
   font-weight: 600;
 }
 
@@ -107,7 +106,7 @@
 .legsButton {
   padding: 6px 14px;
   font-size: 1.2rem;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   color: white;
   border: none;
   border-radius: 6px;
@@ -161,7 +160,7 @@
 
 .input:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
   background-color: var(--bg-card);
 }
 
@@ -184,7 +183,7 @@
 }
 
 .addButton:hover {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(79, 70, 229, 0.1));
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.06));
 }
 
 .continueButton {
@@ -226,7 +225,7 @@
   width: 100%;
   padding: 12px 20px;
   font-size: 1rem;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   color: white;
   border: none;
   border-radius: 8px;
@@ -284,7 +283,7 @@
 
 .helpLink:hover {
   color: var(--bs-link-hover-color);
-  background-color: rgba(99, 102, 241, 0.1);
+  background-color: rgba(37, 99, 235, 0.08);
 }
 
 .themeToggle {

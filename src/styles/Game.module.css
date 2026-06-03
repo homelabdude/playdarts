@@ -1,80 +1,235 @@
 .container {
-  padding: 50px 12px 16px;
-  text-align: center;
+  padding: 52px 12px 20px;
   min-height: 100vh;
-  background-color: var(--bg-light);
-  max-width: 800px;
+  max-width: 900px;
   width: 100%;
   margin: 0 auto;
   position: relative;
+  box-sizing: border-box;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  box-sizing: border-box;
-}
-
-.container > * {
-  width: 100%;
-  max-width: 100%;
+  gap: 10px;
 }
 
 .loading {
   padding: 30px;
   font-size: 16px;
   color: var(--text-secondary);
+  text-align: center;
 }
 
+/* ── Scorebar: full-width, always a single row ── */
+.scorebar {
+  background: var(--bg-card-gradient);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 8px 10px;
+  box-shadow: var(--shadow-sm);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.scorebarMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 7px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--border-color);
+  flex-wrap: nowrap;
+}
+
+.gameMode {
+  font-size: 0.95rem;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  flex-shrink: 0;
+}
+
+.legIndicator {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  padding: 2px 8px;
+  background-color: var(--bg-light);
+  border-radius: 5px;
+  flex-shrink: 0;
+}
+
+.newGameButton {
+  margin-left: auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 3px 10px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.newGameButton:hover {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+}
+
+/* Players: always a single flex row, equal-width items */
+.playersList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  gap: 6px;
+}
+
+.playerItem {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1px;
+  padding: 7px 4px;
+  background-color: var(--bg-light);
+  border-radius: 8px;
+  border: 2px solid var(--border-color);
+  transition: all 0.15s ease;
+  text-align: center;
+  overflow: hidden;
+}
+
+.activePlayer {
+  border-color: var(--accent-color);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.14), rgba(14, 165, 233, 0.1));
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.18);
+}
+
+.playerName {
+  font-size: clamp(0.6rem, 2.2vw, 0.82rem);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  width: 100%;
+  text-align: center;
+}
+
+.playerScore {
+  font-size: clamp(1rem, 3.8vw, 1.4rem);
+  font-weight: 700;
+  color: var(--accent-color);
+  line-height: 1;
+}
+
+.playerStats {
+  font-size: clamp(0.55rem, 1.8vw, 0.68rem);
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+/* ── Board + controls layout ── */
+.gameLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 330px;
+  gap: 16px;
+  align-items: start;
+  flex: 1;
+}
+
+.controlPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  text-align: center;
+  min-width: 0;
+}
+
+.boardPanel {
+  position: sticky;
+  top: 56px;
+}
+
+/* ── Turn indicator ── */
 .turn {
-  font-size: 1.1rem;
-  margin: 12px 0;
-  padding: 10px 18px;
+  font-size: 1rem;
+  padding: 8px 14px;
   border: 2px solid var(--accent-color);
   border-radius: 10px;
   font-weight: 600;
-  display: inline-block;
-  max-width: 80%;
+  display: block;
   box-sizing: border-box;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.hits {
-  margin-top: 12px;
-  font-size: 0.95rem;
-  padding: 10px 16px;
-  background-color: var(--bg-card);
+/* ── Dart slots ── */
+.dartSlots {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.dartSlot {
+  padding: 9px 4px;
   border-radius: 8px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border-color);
-  color: var(--text-primary);
-  max-width: 80%;
-  box-sizing: border-box;
+  border: 2px dashed var(--border-color);
+  text-align: center;
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+  min-height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-light);
+  transition: all 0.15s ease;
 }
 
+.dartSlotFilled {
+  border-style: solid;
+  border-color: var(--accent-color);
+  color: var(--text-primary);
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.08), rgba(14, 165, 233, 0.06));
+  font-weight: 700;
+}
+
+.dartSlotMiss {
+  border-style: solid;
+  border-color: var(--text-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* ── Action buttons ── */
 .buttons {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
   gap: 8px;
-  justify-content: center;
-  margin-top: 16px;
-  flex-wrap: wrap;
-  max-width: 100%;
-  box-sizing: border-box;
 }
 
 .button {
-  padding: 10px 20px;
-  font-size: 0.9rem;
+  padding: 10px 6px;
+  font-size: 0.88rem;
   color: #fff;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  min-width: 100px;
   font-weight: 600;
   transition: all 0.2s ease;
   box-shadow: var(--shadow-sm);
+  white-space: nowrap;
 }
 
 .button:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -111,20 +266,18 @@
   background: linear-gradient(135deg, #dc2626, #b91c1c);
 }
 
-/* Cricket Marks Styles */
+/* ── Cricket marks ── */
 .cricketMarks {
-  margin-top: 16px;
-  padding: 16px;
-  background-color: var(--bg-card);
+  padding: 12px;
+  background: var(--bg-card-gradient);
   border-radius: 12px;
   box-shadow: var(--shadow-sm);
-  max-width: 100%;
-  box-sizing: border-box;
+  border: 1px solid var(--border-color);
 }
 
 .cricketHeading {
-  font-size: 1.1rem;
-  margin-bottom: 12px;
+  font-size: 1rem;
+  margin-bottom: 10px;
   color: var(--text-primary);
   font-weight: 600;
 }
@@ -134,31 +287,26 @@
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   justify-content: center;
-  align-items: center;
 }
 
 .markItem {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
+  gap: 5px;
+  padding: 5px 10px;
   background-color: var(--bg-light);
   border-radius: 6px;
   border: 2px solid var(--border-color);
   font-weight: 500;
   transition: all 0.2s ease;
-  font-size: 0.875rem;
+  font-size: 0.82rem;
 }
 
 .markClosed {
   border-color: var(--accent-color);
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.1),
-    rgba(79, 70, 229, 0.1)
-  );
+  background: linear-gradient(135deg, rgba(37, 99, 235, 0.1), rgba(14, 165, 233, 0.08));
   font-weight: 700;
   color: var(--accent-color);
 }
@@ -166,147 +314,30 @@
 .checkmark {
   color: #10b981;
   font-weight: bold;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .cricketScore {
-  margin-top: 12px;
-  font-size: 0.95rem;
+  margin-top: 10px;
+  font-size: 0.88rem;
   color: var(--text-secondary);
 }
 
-/* Players Card Styles */
-.playersCard {
-  margin-top: 16px;
-  margin-bottom: 12px;
-  padding: 8px;
-  background-color: var(--bg-card);
-  border-radius: 10px;
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--border-color);
-  width: 80%;
-  max-width: 80%;
-  box-sizing: border-box;
-}
-
-.gameInfo {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 8px;
-  border-bottom: 2px solid var(--border-color);
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.gameMode {
-  font-size: 1.1rem;
-  font-weight: 700;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.legIndicator {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  padding: 4px 10px;
-  background-color: var(--bg-light);
-  border-radius: 6px;
-}
-
-.newGameButton {
-  font-size: 0.75rem;
-  font-weight: 600;
-  padding: 4px 12px;
-  background: linear-gradient(135deg, #ef4444, #dc2626);
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  box-shadow: var(--shadow-sm);
-}
-
-.newGameButton:hover {
-  background: linear-gradient(135deg, #dc2626, #b91c1c);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.newGameButton:active {
-  transform: translateY(0);
-}
-
-.playersList {
-  list-style: none;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 8px;
-}
-
-.playerItem {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 10px 8px;
-  background-color: var(--bg-light);
-  border-radius: 8px;
-  border: 2px solid var(--border-color);
-  transition: all 0.2s ease;
-  text-align: center;
-}
-
-.activePlayer {
-  border-color: var(--accent-color);
-  background: linear-gradient(
-    135deg,
-    rgba(99, 102, 241, 0.15),
-    rgba(79, 70, 229, 0.15)
-  );
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
-}
-
-.playerName {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--text-primary);
-  margin-bottom: 2px;
-}
-
-.playerScore {
-  font-size: 1.3rem;
-  font-weight: 700;
-  color: var(--accent-color);
-  line-height: 1;
-}
-
-.playerStats {
-  font-size: 0.65rem;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  margin-top: 2px;
-}
-
+/* ── Fixed corner buttons ── */
 .backButton {
   position: fixed;
   top: 12px;
   left: 12px;
   z-index: 1000;
-  width: 40px;
-  height: 40px;
-  background-color: var(--bg-card);
+  width: 38px;
+  height: 38px;
+  background: var(--bg-card-gradient);
   border: 2px solid var(--border-color);
   border-radius: 50%;
   color: var(--text-primary);
   text-decoration: none;
   font-weight: 600;
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   box-shadow: var(--shadow-lg);
   transition: all 0.2s ease;
   display: flex;
@@ -316,7 +347,7 @@
 }
 
 .backButton:hover {
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent-color);
   transform: scale(1.1);
@@ -328,13 +359,13 @@
   top: 12px;
   right: 12px;
   z-index: 1000;
-  width: 40px;
-  height: 40px;
-  background-color: var(--bg-card);
+  width: 38px;
+  height: 38px;
+  background: var(--bg-card-gradient);
   border: 2px solid var(--border-color);
   border-radius: 50%;
   color: var(--text-primary);
-  font-size: 1.2rem;
+  font-size: 1.1rem;
   box-shadow: var(--shadow-lg);
   transition: all 0.2s ease;
   display: flex;
@@ -344,7 +375,7 @@
 }
 
 .themeToggle:hover {
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   color: white;
   border-color: var(--accent-color);
   transform: scale(1.1) rotate(20deg);
@@ -355,7 +386,7 @@
   display: none;
 }
 
-/* Winner Overlay */
+/* ── Winner overlay ── */
 .winnerOverlay {
   position: fixed;
   inset: 0;
@@ -379,7 +410,7 @@
   align-items: center;
   gap: 16px;
   padding: 40px 48px;
-  background: var(--bg-card);
+  background: var(--bg-card-gradient);
   border-radius: 20px;
   border: 2px solid var(--accent-color);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
@@ -394,8 +425,8 @@
 }
 
 .trophyIcon {
-  width: 96px;
-  height: 96px;
+  width: 88px;
+  height: 88px;
   color: #f59e0b;
   filter: drop-shadow(0 4px 12px rgba(245, 158, 11, 0.5));
   animation: float 2.5s ease-in-out infinite;
@@ -407,7 +438,7 @@
 }
 
 .winnerTitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--text-secondary);
   margin: 0;
@@ -419,7 +450,7 @@
   font-size: 2.2rem;
   font-weight: 800;
   margin: 0;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -431,7 +462,7 @@
   font-size: 1rem;
   font-weight: 700;
   color: #fff;
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+  background: var(--accent-gradient);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -448,69 +479,53 @@
   transform: translateY(0);
 }
 
-/* Mobile Responsiveness */
-@media (max-width: 640px) {
+/* ── Mobile: single column, board on top ── */
+@media (max-width: 700px) {
   .container {
-    padding: 50px 8px 10px;
+    padding: 52px 10px 16px;
+    gap: 8px;
+  }
+
+  .gameLayout {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .boardPanel {
+    position: static;
+    order: -1;
+  }
+
+  .controlPanel {
+    order: 1;
+    gap: 8px;
   }
 
   .turn {
-    font-size: 1rem;
-    padding: 8px 14px;
-  }
-
-  .buttons {
-    gap: 6px;
+    font-size: 0.9rem;
+    padding: 7px 12px;
   }
 
   .button {
-    padding: 9px 16px;
-    min-width: 90px;
-    font-size: 0.85rem;
+    padding: 10px 4px;
+    font-size: 0.82rem;
   }
 
-  .playersCard,
-  .cricketMarks {
-    padding: 10px;
+  .dartSlot {
+    font-size: 0.78rem;
+    min-height: 38px;
+    padding: 7px 2px;
+  }
+}
+
+/* ── Very narrow (≤360px) ── */
+@media (max-width: 360px) {
+  .button {
+    font-size: 0.72rem;
+    padding: 9px 2px;
   }
 
-  .gameMode {
-    font-size: 1rem;
-  }
-
-  .legIndicator {
-    font-size: 0.7rem;
-    padding: 3px 8px;
-  }
-
-  .newGameButton {
-    font-size: 0.7rem;
-    padding: 3px 10px;
-  }
-
-  .playersList {
-    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    gap: 6px;
-  }
-
-  .playerItem {
-    padding: 8px 6px;
-  }
-
-  .playerName {
-    font-size: 1rem;
-  }
-
-  .playerScore {
-    font-size: 1.1rem;
-  }
-
-  .playerStats {
-    font-size: 0.6rem;
-  }
-
-  .markItem {
-    padding: 5px 10px;
-    font-size: 0.8rem;
+  .scorebarMeta {
+    gap: 5px;
   }
 }

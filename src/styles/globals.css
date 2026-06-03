@@ -1,38 +1,45 @@
-/* Modern, slick color palette */
 :root {
-  --bs-primary: #0f172a;
-  --bs-primary-rgb: 15, 23, 42;
-  --bs-link-color: #6366f1;
-  --bs-link-hover-color: #4f46e5;
-  --accent-color: #6366f1;
-  --accent-hover: #4f46e5;
-  --bg-light: #f8fafc;
+  --bs-primary: #1e40af;
+  --bs-primary-rgb: 30, 64, 175;
+  --bs-link-color: #2563eb;
+  --bs-link-hover-color: #1d4ed8;
+  --accent-color: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%);
+  --bg-gradient: linear-gradient(160deg, #f0f6ff 0%, #e4eefd 45%, #edf0ff 100%);
+  --bg-light: #eef4ff;
   --bg-card: #ffffff;
+  --bg-card-gradient: linear-gradient(145deg, #ffffff 0%, #f5f9ff 100%);
   --text-primary: #0f172a;
-  --text-secondary: #64748b;
-  --border-color: #e2e8f0;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --text-secondary: #475569;
+  --border-color: #dbeafe;
+  --shadow-sm: 0 1px 3px 0 rgb(37 99 235 / 0.08), 0 1px 2px -1px rgb(37 99 235 / 0.06);
+  --shadow-md: 0 4px 6px -1px rgb(37 99 235 / 0.1), 0 2px 4px -2px rgb(37 99 235 / 0.06);
+  --shadow-lg: 0 10px 15px -3px rgb(37 99 235 / 0.1), 0 4px 6px -4px rgb(37 99 235 / 0.06);
+  --shadow-xl: 0 20px 25px -5px rgb(37 99 235 / 0.1), 0 8px 10px -6px rgb(37 99 235 / 0.06);
 }
 
 .dark {
-  --bs-primary: #6366f1;
-  --bs-primary-rgb: 99, 102, 241;
-  --bs-link-color: #818cf8;
-  --bs-link-hover-color: #a5b4fc;
-  --accent-color: #818cf8;
-  --accent-hover: #a5b4fc;
-  --bg-light: #0f172a;
-  --bg-card: #1e293b;
-  --text-primary: #f1f5f9;
+  --bs-primary: #2563eb;
+  --bs-primary-rgb: 37, 99, 235;
+  --bs-link-color: #7dd3fc;
+  --bs-link-hover-color: #0ea5e9;
+  --accent-color: #0ea5e9;
+  --accent-hover: #7dd3fc;
+  --accent-gradient: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
+  --accent-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%);
+  --bg-gradient: linear-gradient(160deg, #080f1e 0%, #0d1d33 50%, #0f1228 100%);
+  --bg-light: #0f1e2e;
+  --bg-card: #1a2d42;
+  --bg-card-gradient: linear-gradient(145deg, #1e3352 0%, #18293d 100%);
+  --text-primary: #f0f9ff;
   --text-secondary: #94a3b8;
-  --border-color: #334155;
-  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.5), 0 1px 2px -1px rgb(0 0 0 / 0.5);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.5);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.5), 0 8px 10px -6px rgb(0 0 0 / 0.5);
+  --border-color: #1e3a5f;
+  --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.4), 0 8px 10px -6px rgb(0 0 0 / 0.4);
 }
 
 * {
@@ -43,7 +50,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background-color: var(--bg-light);
+  background: var(--bg-gradient);
+  min-height: 100vh;
   color: var(--text-primary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
