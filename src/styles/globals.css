@@ -29,13 +29,13 @@
   --accent-hover: #7dd3fc;
   --accent-gradient: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
   --accent-gradient-hover: linear-gradient(135deg, #1d4ed8 0%, #0284c7 100%);
-  --bg-gradient: linear-gradient(160deg, #080f1e 0%, #0d1d33 50%, #0f1228 100%);
-  --bg-light: #0f1e2e;
-  --bg-card: #1a2d42;
-  --bg-card-gradient: linear-gradient(145deg, #1e3352 0%, #18293d 100%);
+  --bg-gradient: linear-gradient(160deg, #03060d 0%, #060d19 50%, #070914 100%);
+  --bg-light: #070f1a;
+  --bg-card: #0d1826;
+  --bg-card-gradient: linear-gradient(145deg, #111e31 0%, #0a1420 100%);
   --text-primary: #f0f9ff;
   --text-secondary: #94a3b8;
-  --border-color: #1e3a5f;
+  --border-color: #15283f;
   --shadow-sm: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
   --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.4);
   --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.4), 0 4px 6px -4px rgb(0 0 0 / 0.4);
